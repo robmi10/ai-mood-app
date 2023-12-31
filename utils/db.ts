@@ -1,16 +1,11 @@
 import { Kysely, PostgresDialect } from "kysely";
 import { Pool } from "pg";
-import { Database } from "../types/database";
+import { DB } from "./kysely-types";
 
 const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOSTNAME,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: parseInt(process.env.DATABASE_PORT || "5432"),
-  max: 10,
+  connectionString: process.env.DATABASE_URL,
 });
 
-export const db = new Kysely<Database>({
+export const db = new Kysely<DB>({
   dialect: new PostgresDialect({ pool }),
 });

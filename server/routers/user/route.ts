@@ -1,8 +1,16 @@
 import { db } from "@/utils/db";
-import { publicProcedure, createTRPCRouter, router } from "../../trpc";
+import { publicProcedure, createTRPCRouter } from "../../trpc";
 import { z } from "zod";
 
 export const usersRouter = createTRPCRouter({
+  getUsers: publicProcedure.query(async () => {
+    const users = await db
+      .selectFrom("users")
+      .select(["age", "name"])
+      .executeTakeFirstOrThrow();
+
+    return { users };
+  }),
   createUser: publicProcedure
     .input(
       z.object({
@@ -11,8 +19,9 @@ export const usersRouter = createTRPCRouter({
       })
     )
     .mutation(async (opts) => {
+      console.log("inside insert user here opts ->!", opts);
       await db
-        .insertInto("user")
+        .insertInto("users")
         .values({ name: opts.input.name, age: opts.input.age })
         .executeTakeFirstOrThrow();
     }),

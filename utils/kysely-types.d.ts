@@ -1,4 +1,4 @@
-export interface User {
+export interface Users {
   id?: number;
   name: string;
   age: number;
@@ -6,5 +6,5 @@ export interface User {
 }
 
 export interface DB {
-  user: User;
+  users: Users;
 }

@@ -7,7 +7,7 @@ export const usersRouter = createTRPCRouter({
     const users = await db
       .selectFrom("users")
       .select(["age", "name"])
-      .executeTakeFirstOrThrow();
+      .execute();
 
     return { users };
   }),
@@ -19,10 +19,9 @@ export const usersRouter = createTRPCRouter({
       })
     )
     .mutation(async (opts) => {
-      console.log("inside insert user here opts ->!", opts);
       await db
         .insertInto("users")
         .values({ name: opts.input.name, age: opts.input.age })
-        .executeTakeFirstOrThrow();
+        .execute();
     }),
 });

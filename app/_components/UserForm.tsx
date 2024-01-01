@@ -5,21 +5,28 @@ import { Input } from "@/lib/components/ui/input";
 import { useState } from "react";
 
 export default function UserForm() {
-  const createUser = api.users.createUser.useMutation();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
+  const getUsers = api.users.getUsers.useQuery();
+  const createUser = api.users.createUser.useMutation({
+    onSettled: () => {
+      getUsers.refetch();
+      setName("");
+      setAge("");
+    },
+  });
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    console.log("inside handleSubmit ->", name, age);
     createUser.mutateAsync({ name: name, age: Number(age) });
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-12 p-24 bg-red-400">
+    <div className="flex h-auto flex-col justify-center items-center gap-12 p-24 bg-red-400">
       <div className="text-4xl text-white font-bold">CREATE USER</div>
       <form onSubmit={(e) => handleSubmit(e)}>
         <Input
+          value={name}
           onChange={(e) => {
             setName(e.target.value);
           }}
@@ -27,6 +34,7 @@ export default function UserForm() {
           placeholder="insert name ..."
         />
         <Input
+          value={age}
           type="number"
           onChange={(e) => {
             setAge(e.target.value);
@@ -34,8 +42,19 @@ export default function UserForm() {
           className="w-64"
           placeholder="insert age ..."
         />
-        <Button onClick={handleSubmit}>SUBMIT</Button>
+        <Button type="submit">SUBMIT</Button>
       </form>
+
+      <div className="bg-blue w-96 h-auto bg-blue-300 flex flex-col gap-2 text-white text-3xl">
+        {getUsers?.data?.users.map((user, i) => {
+          return (
+            <div key={i} className="flex flex-row gap-2">
+              <span>Name: {user.name}</span>
+              <span>Age: {user.age}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

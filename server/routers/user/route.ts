@@ -1,9 +1,9 @@
 import { db } from "@/utils/db";
-import { publicProcedure, createTRPCRouter } from "../../trpc";
+import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
 
 export const usersRouter = createTRPCRouter({
-  getUsers: publicProcedure.query(async () => {
+  getUsers: protectedProcedure.query(async () => {
     const users = await db
       .selectFrom("users")
       .select(["age", "name"])
@@ -11,7 +11,7 @@ export const usersRouter = createTRPCRouter({
 
     return { users };
   }),
-  createUser: publicProcedure
+  createUser: protectedProcedure
     .input(
       z.object({
         name: z.string(),

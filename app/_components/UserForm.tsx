@@ -3,7 +3,6 @@ import { api } from "@/lib/api";
 import { Button } from "@/lib/components/ui/button";
 import { Input } from "@/lib/components/ui/input";
 import { useState } from "react";
-
 export default function UserForm() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");

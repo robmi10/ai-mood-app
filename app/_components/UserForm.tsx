@@ -2,12 +2,16 @@
 import { api } from "@/lib/api";
 import { Button } from "@/lib/components/ui/button";
 import { Input } from "@/lib/components/ui/input";
-import { getSession } from "next-auth/react";
 import { useState } from "react";
-export default async function asyncUserForm() {
+import { useSession } from 'next-auth/react';
+
+export default function asyncUserForm() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const getUsers = api.users.getUsers.useQuery();
+  const { data: session, status } = useSession();
+
+  console.log("session check now: ", session)
   const createUser = api.users.createUser.useMutation({
     onSettled: () => {
       getUsers.refetch();
@@ -15,9 +19,6 @@ export default async function asyncUserForm() {
       setAge("");
     },
   });
-  const session = await getSession();
-
-  console.log("session ->", session)
 
   const handleSubmit = (e: any) => {
     e.preventDefault();

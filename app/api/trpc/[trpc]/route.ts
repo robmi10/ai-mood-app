@@ -5,7 +5,6 @@ import { createInnerContext } from "@/server/trpc";
 
 const handler = (req: NextRequest) =>
   fetchRequestHandler({
-
     endpoint: "/api/trpc",
     req,
     router: appRouter,

@@ -6,7 +6,7 @@ export const usersRouter = createTRPCRouter({
   getUsers: protectedProcedure.query(async () => {
     const users = await db
       .selectFrom("users")
-      .select(["age", "name"])
+      .select(["email", "name"])
       .execute();
 
     return { users };
@@ -15,13 +15,13 @@ export const usersRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string(),
-        age: z.number(),
+        email: z.string(),
       })
     )
     .mutation(async (opts) => {
       await db
         .insertInto("users")
-        .values({ name: opts.input.name, age: opts.input.age })
+        .values({ name: opts.input.name, email: opts.input.email })
         .execute();
     }),
 });

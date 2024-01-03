@@ -9,7 +9,7 @@ export default function asyncUserForm() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const getUsers = api.users.getUsers.useQuery();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   console.log("session check now: ", session)
   const createUser = api.users.createUser.useMutation({

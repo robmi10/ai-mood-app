@@ -14,7 +14,6 @@ export const publicProcedure = t.procedure;
 export const createTRPCRouter = t.router;
 
 const isUserAuthed = t.middleware(({ ctx, next }) => {
-  console.log("ctx check ->", ctx)
   if (!ctx.session) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }

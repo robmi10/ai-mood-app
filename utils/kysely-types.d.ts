@@ -5,6 +5,15 @@ export interface Users {
   createdAt?: Date;
 }
 
+export interface Moods {
+  id?: number;
+  userId: number;
+  moodScore: number;
+  notes?: string;
+  createdAt?: Date;
+}
+
 export interface DB {
   users: Users;
+  moods: Moods;
 }

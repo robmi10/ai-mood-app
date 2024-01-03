@@ -1,6 +1,6 @@
 // migrations/[timestamp]_create_mood_entries_table.js
 exports.up = function (knex) {
-    return knex.schema.createTable('mood_entries', function (table) {
+    return knex.schema.createTable('moods', function (table) {
         table.increments('id');
         table.integer('userId').unsigned().notNullable().references('id').inTable('users').onDelete('CASCADE');
         table.integer('moodScore').notNullable();
@@ -11,5 +11,5 @@ exports.up = function (knex) {
 };
 
 exports.down = function (knex) {
-    return knex.schema.dropTable('mood_entries');
+    return knex.schema.dropTable('moods');
 };

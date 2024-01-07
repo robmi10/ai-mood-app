@@ -9,10 +9,17 @@ export const moodRouter = createTRPCRouter({
                 userId: z.number(),
                 moodScore: z.number(),
                 notes: z.string(),
+                activities: z.array(z.string()),
+                weather: z.string(),
+                sleepQuality: z.string()
             })
         )
         .mutation(async (opts) => {
             await db
-                .insertInto("moods").values({ userId: opts.input.userId, moodScore: opts.input.moodScore, notes: opts.input.notes }).execute()
+                .insertInto("moods").values({
+                    userId: opts.input.userId, moodScore: opts.input.moodScore,
+                    notes: opts.input.notes, activities: opts.input.activities,
+                    weather: opts.input.weather, sleepQuality: opts.input.sleepQuality
+                }).execute()
         }),
 });

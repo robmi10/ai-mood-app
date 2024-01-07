@@ -11,6 +11,9 @@ export interface Moods {
   moodScore: number;
   notes?: string;
   createdAt?: Date;
+  activities?: string[]
+  sleepQuality?: string,
+  weather?: string
 }
 
 export interface DB {

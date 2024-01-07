@@ -1,6 +1,7 @@
 import "./globals.css";
 import Provider from "./_trpc/Provider";
 import NextAuthProvider from "./_components/SessionProvider"
+import { MoodProvider } from "./_components/context/MoodContext";
 
 export default function RootLayout({
   children,
@@ -13,7 +14,9 @@ export default function RootLayout({
       <body>
         <NextAuthProvider>
           <Provider>
-            {children}
+            <MoodProvider>
+              {children}
+            </MoodProvider>
           </Provider>
         </NextAuthProvider>
       </body>

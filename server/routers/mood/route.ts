@@ -2,7 +2,6 @@ import { db } from "@/utils/db/db";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
 import { getEmbedding } from "@/utils/ai/openai";
-import { error } from "console";
 import { pineconeIndex } from "@/utils/db/pinecone";
 
 export const moodRouter = createTRPCRouter({
@@ -23,7 +22,9 @@ export const moodRouter = createTRPCRouter({
                 .select("id")
                 .orderBy("createdAt", "desc") // Replace "createdAt" with your actual timestamp column name
                 .limit(1)
-                .executeTakeFirstOrThrow();
+                .executeTakeFirst();
+
+            const moodId = latestMoodId ? Number(latestMoodId.id) + 1 : 0
 
             await db.transaction().execute(async (trx) => {
                 try {
@@ -34,7 +35,6 @@ export const moodRouter = createTRPCRouter({
                     }).returningAll()
                         .executeTakeFirstOrThrow();
 
-
                     const moodEntry = {
                         userId: opts.input.userId,
                         moodScore: opts.input.moodScore,
@@ -42,14 +42,14 @@ export const moodRouter = createTRPCRouter({
                         sleepQuality: opts.input.sleepQuality,
                         notes: opts.input.notes,
                         weather: opts.input.weather,
-                        id: Number(latestMoodId.id) + 1,
+                        id: moodId,
                         date: new Date()
                     }
-
                     const embedding = await getEmbedding(moodEntry)
+                    console.log("embedding ->", embedding)
                     await pineconeIndex.upsert([
                         {
-                            id: opts.input.userId.toString(),
+                            id: moodId.toString(),
                             values: embedding,
                             metadata: {
                                 userId: moodEntry.userId,
@@ -60,7 +60,7 @@ export const moodRouter = createTRPCRouter({
                                 sleepQuality: moodEntry.sleepQuality,
                             }
                         }
-                    ])
+                    ]).then((res) => console.log("res from pincone ->", res))
 
                 } catch (error) {
                     console.error("Failed to create mood and embedding:", error);
@@ -69,13 +69,15 @@ export const moodRouter = createTRPCRouter({
             })
         }),
     getDailyMoodReflectionAndMotivation:
-        protectedProcedure.query(async () => {
+        protectedProcedure.input(z.object({ userId: z.number() })).query(async (opts) => {
             const mostCommonMoods = await db.selectFrom('moods')
+                .select('userId')
                 .select('moodScore')
                 .select('weather')
                 .select('activities')
                 .select('sleepQuality')
                 .select((eb) => eb.fn.countAll().as("occurrences"))
+                .groupBy('userId')
                 .groupBy('moodScore')
                 .groupBy('weather')
                 .groupBy('activities')
@@ -83,6 +85,21 @@ export const moodRouter = createTRPCRouter({
                 .orderBy('occurrences', 'desc')
                 .limit(1)
                 .execute();
-            return mostCommonMoods
+            console.log("mostCommonMoods check ->", mostCommonMoods)
+
+            const embedding = await getEmbedding(mostCommonMoods[0])
+            console.log("embedding inside most common->", embedding)
+            const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 4, filter: { userId: opts.input.userId } })
+            console.log("vectorMoodFilter ->", vectorMoodFilter)
+
+            const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).execute()
+            console.log("allMoodsFromUser ->", allMoodsFromUser)
+
+            const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
+
+            console.log("pineconeIds ->", pineconeIds)
+            const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
+
+            console.log("matchedMoods ->", matchedMoods)
         })
 });

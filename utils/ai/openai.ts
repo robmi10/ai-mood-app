@@ -18,19 +18,11 @@ export async function getEmbedding(moodEntry: any) {
         `Weather: ${moodEntry.weather}. ` +
         `Sleep Quality: ${moodEntry.sleepQuality}.`;
 
-    console.log("openai ->", openai)
-    try {
-        const response = await openai.embeddings.create({
-            model: "text-embedding-ada-002",
-            input: text,
-        });
-        const embedding = response.data[0].embedding;
-        if (!embedding) throw new Error("No embedding generated.");
-        return embedding;
-    } catch (error) {
-        console.error("Failed to create embedding:", error);
-        // Handle the error appropriately
-    }
-    return text;
-
+    const response = await openai.embeddings.create({
+        model: "text-embedding-ada-002",
+        input: text,
+    });
+    const embedding = response.data[0].embedding;
+    if (!embedding) throw new Error("No embedding generated.");
+    return embedding;
 }

@@ -11,4 +11,4 @@ const pinecone = new Pinecone({
     apiKey,
 })
 
-export const notesIndex = pinecone.Index("moodai");
+export const pineconeIndex = pinecone.Index("moodai");

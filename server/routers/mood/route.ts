@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
 import { getEmbedding } from "@/utils/ai/openai";
 import { error } from "console";
+import { pineconeIndex } from "@/utils/db/pinecone";
 
 export const moodRouter = createTRPCRouter({
     createMood: protectedProcedure
@@ -23,32 +24,49 @@ export const moodRouter = createTRPCRouter({
                 .orderBy("createdAt", "desc") // Replace "createdAt" with your actual timestamp column name
                 .limit(1)
                 .executeTakeFirstOrThrow();
-            console.log("latestMoodId ->", latestMoodId)
 
-            const moodEntry = {
-                userId: opts.input.userId,
-                moodScore: opts.input.moodScore,
-                activities: opts.input.activities,
-                sleepQuality: opts.input.sleepQuality,
-                notes: opts.input.notes,
-                weather: opts.input.weather,
-                id: Number(latestMoodId.id) + 1,
-                date: new Date()
-            }
+            await db.transaction().execute(async (trx) => {
+                try {
+                    trx.insertInto("moods").values({
+                        userId: opts.input.userId, moodScore: opts.input.moodScore,
+                        notes: opts.input.notes, activities: opts.input.activities,
+                        weather: opts.input.weather, sleepQuality: opts.input.sleepQuality
+                    }).returningAll()
+                        .executeTakeFirstOrThrow();
 
-            console.log("latestMoodId ->", latestMoodId)
-            console.log("moodEntry ->", moodEntry)
-            const embedding = await getEmbedding(moodEntry)
 
-            console.log("embedding ->", embedding)
-            if (2 > 1) throw error('Failed to embed the data.')
+                    const moodEntry = {
+                        userId: opts.input.userId,
+                        moodScore: opts.input.moodScore,
+                        activities: opts.input.activities,
+                        sleepQuality: opts.input.sleepQuality,
+                        notes: opts.input.notes,
+                        weather: opts.input.weather,
+                        id: Number(latestMoodId.id) + 1,
+                        date: new Date()
+                    }
 
-            await db
-                .insertInto("moods").values({
-                    userId: opts.input.userId, moodScore: opts.input.moodScore,
-                    notes: opts.input.notes, activities: opts.input.activities,
-                    weather: opts.input.weather, sleepQuality: opts.input.sleepQuality
-                }).execute()
+                    const embedding = await getEmbedding(moodEntry)
+                    await pineconeIndex.upsert([
+                        {
+                            id: opts.input.userId.toString(),
+                            values: embedding,
+                            metadata: {
+                                userId: moodEntry.userId,
+                                date: moodEntry.date.toISOString(),
+                                moodScore: moodEntry.moodScore,
+                                activities: moodEntry.activities.join(', '),
+                                weather: moodEntry.weather,
+                                sleepQuality: moodEntry.sleepQuality,
+                            }
+                        }
+                    ])
+
+                } catch (error) {
+                    console.error("Failed to create mood and embedding:", error);
+                    throw error
+                }
+            })
         }),
     getDailyMoodReflectionAndMotivation:
         protectedProcedure.query(async () => {

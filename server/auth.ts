@@ -1,4 +1,4 @@
-import { db } from "@/utils/db";
+import { db } from "@/utils/db/db";
 import { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 

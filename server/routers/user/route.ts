@@ -1,4 +1,4 @@
-import { db } from "@/utils/db";
+import { db } from "@/utils/db/db";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
 
 export const usersRouter = createTRPCRouter({

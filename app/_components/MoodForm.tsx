@@ -16,6 +16,11 @@ export default function asyncUserForm() {
   const { selectedSleep, setSelectedSleep, selectedWeather,
     setSelectedWeather, selectedActivity, setSelectedActivity } = useContext(MoodContext);
   const getUsers = api.users.getUsers.useQuery();
+  const getMoods = api.users.getUsers.useQuery();
+  const getMostCommonMoodCombo = api.mood.getDailyMoodReflectionAndMotivation.useQuery()
+
+  console.log("getMostCommonMoodCombo ->", getMostCommonMoodCombo.data)
+  console.log("getUsers ->", getUsers.data)
 
   const user = getUsers?.data?.users[0]
   const MOODS = [

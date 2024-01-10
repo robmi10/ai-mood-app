@@ -13,13 +13,17 @@ import MoodContext from "./context/MoodContext";
 export default function asyncUserForm() {
   const [selectedMood, setSelectedMood] = useState("");
   const [notes, setNotes] = useState("");
+  const [reflectionMood, setReflectionMood] = useState("");
   const { selectedSleep, setSelectedSleep, selectedWeather,
     setSelectedWeather, selectedActivity, setSelectedActivity } = useContext(MoodContext);
   const getUsers = api.users.getUsers.useQuery();
   const user = getUsers?.data?.users[0]
-  const getMostCommonMoodCombo = api.mood.getDailyMoodReflectionAndMotivation.useQuery({ userId: user?.id })
+  const getMostCommonMoodCombo = api.mood.getDailyMoodReflectionAndMotivation.useQuery({ userId: user?.id }, {
+    enabled: !!user?.id  // The query will only run if `user?.id` is truthy
+  })
+  // const aiRespone = getMostCommonMoodCombo?.data?.content
 
-  console.log("getMostCommonMoodCombo ->", getMostCommonMoodCombo.data)
+  // console.log("getMostCommonMoodCombo ->", getMostCommonMoodCombo)
   console.log("getUsers ->", getUsers.data)
 
   const MOODS = [
@@ -57,10 +61,21 @@ export default function asyncUserForm() {
     setSelectedMood(mood);
   };
 
+  const getMoodReflection = () => {
+    const getMostCommonMoodCombo = api.mood.getDailyMoodReflectionAndMotivation.useQuery({ userId: user?.id })
+    const aiRespone = getMostCommonMoodCombo?.data?.content
+    if (aiRespone) {
+      setReflectionMood(aiRespone)
+    }
+  }
+
   return (
     <div className="flex h-auto flex-col items-center gap-12">
       <div className="text-4xl text-black font-bold items-center">WELCOME {user?.name}</div>
       <div className="text-2xl text-black font-bold items-center"> HOW IS YOUR MOOD TODAY?</div>
+
+      <Button onClick={getMoodReflection} className="border p-4 bg-blue-50 hover:bg-blue-100">GET A SUMMARY OF MY MOOD FROM THE LAST WEEK</Button>
+      {/* {aiRespone && <div className="text-bold text-black font-medium items-center">{aiRespone}</div>} */}
       <div className="flex gap-2">
         <Button onClick={() => { handleMoodClick(MOODS[0]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[0] === selectedMood && 'bg-blue-200')}>GREAT</Button>
         <Button onClick={() => { handleMoodClick(MOODS[1]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[1] === selectedMood && 'bg-blue-200')}>GOOD</Button>

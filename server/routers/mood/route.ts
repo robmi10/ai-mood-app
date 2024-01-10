@@ -1,8 +1,10 @@
 import { db } from "@/utils/db/db";
 import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
-import { getEmbedding } from "@/utils/ai/openai";
+import openai, { getEmbedding } from "@/utils/ai/openai";
 import { pineconeIndex } from "@/utils/db/pinecone";
+import { ChatCompletion, ChatCompletionMessage, ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
+import { OpenAIStream, StreamingTextResponse } from 'ai';
 
 export const moodRouter = createTRPCRouter({
     createMood: protectedProcedure
@@ -101,5 +103,26 @@ export const moodRouter = createTRPCRouter({
             const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
 
             console.log("matchedMoods ->", matchedMoods)
+
+            let prompt = `You are a mood analyzer. Based on the following mood data, please provide a comprehensive summary and analysis. The most common mood combination is a mood score of ${mostCommonMoods[0].moodScore}, with activities like ${mostCommonMoods[0].activities}, in ${mostCommonMoods[0].weather} weather, and '${mostCommonMoods[0].sleepQuality} Sleep'. Similar mood entries include:\n`;
+            matchedMoods.forEach(entry => {
+                prompt += `ID: ${entry.id}, Mood Score: ${entry.moodScore}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}, Notes: ${entry.notes || 'None'}, Date: ${entry.createdAt && entry.createdAt.toLocaleString()}\n`;
+            });
+            prompt += "What patterns or insights can be drawn from these mood entries?";
+            const systemMessage: ChatCompletionSystemMessageParam = {
+                role: "system",
+                content: prompt
+            }
+
+            const response = await openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                stream: false,
+                messages: [systemMessage]
+            })
+
+            console.log("response check now->", response)
+            const message = response.choices[0].message
+            console.log("message ->", message)
+            return message;
         })
 });

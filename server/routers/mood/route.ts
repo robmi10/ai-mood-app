@@ -5,6 +5,9 @@ import openai, { getEmbedding } from "@/utils/ai/openai";
 import { pineconeIndex } from "@/utils/db/pinecone";
 import { ChatCompletion, ChatCompletionMessage, ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 import { OpenAIStream, StreamingTextResponse } from 'ai';
+import { formatMoodToPoint, formatPointToMood } from "@/lib/utils/formatMood";
+import { formatDateWithDay } from "@/lib/utils/formatDate";
+import { getLastWeekDates, getTimeFrameDate } from "@/lib/utils/getLatestDate";
 
 export const moodRouter = createTRPCRouter({
     createMood: protectedProcedure
@@ -48,7 +51,6 @@ export const moodRouter = createTRPCRouter({
                         date: new Date()
                     }
                     const embedding = await getEmbedding(moodEntry)
-                    console.log("embedding ->", embedding)
                     await pineconeIndex.upsert([
                         {
                             id: moodId.toString(),
@@ -62,8 +64,7 @@ export const moodRouter = createTRPCRouter({
                                 sleepQuality: moodEntry.sleepQuality,
                             }
                         }
-                    ]).then((res) => console.log("res from pincone ->", res))
-
+                    ])
                 } catch (error) {
                     console.error("Failed to create mood and embedding:", error);
                     throw error
@@ -87,26 +88,15 @@ export const moodRouter = createTRPCRouter({
                 .orderBy('occurrences', 'desc')
                 .limit(1)
                 .execute();
-            console.log("mostCommonMoods check ->", mostCommonMoods)
 
             const embedding = await getEmbedding(mostCommonMoods[0])
-            console.log("embedding inside most common->", embedding)
             const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 4, filter: { userId: opts.input.userId } })
-            console.log("vectorMoodFilter ->", vectorMoodFilter)
-
             const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).execute()
-            console.log("allMoodsFromUser ->", allMoodsFromUser)
-
             const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
-
-            console.log("pineconeIds ->", pineconeIds)
             const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
-
-            console.log("matchedMoods ->", matchedMoods)
-
-            let prompt = `You are a mood analyzer. Based on the following mood data, please provide a comprehensive summary and analysis. The most common mood combination is a mood score of ${mostCommonMoods[0].moodScore}, with activities like ${mostCommonMoods[0].activities}, in ${mostCommonMoods[0].weather} weather, and '${mostCommonMoods[0].sleepQuality} Sleep'. Similar mood entries include:\n`;
+            let prompt = `As a mood analyzer, provide a very short yet insightful summary focusing on key patterns in mood based on the following data. Based on the following mood data, please provide a comprehensive summary and analysis. The most common mood combination is a mood score of ${mostCommonMoods[0].moodScore}, with activities like ${mostCommonMoods[0].activities}, in ${mostCommonMoods[0].weather} weather, and '${mostCommonMoods[0].sleepQuality} Sleep'. Similar mood entries include:\n`;
             matchedMoods.forEach(entry => {
-                prompt += `ID: ${entry.id}, Mood Score: ${entry.moodScore}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}, Notes: ${entry.notes || 'None'}, Date: ${entry.createdAt && entry.createdAt.toLocaleString()}\n`;
+                prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}, Notes: ${entry.notes || 'None'}`;
             });
             prompt += "What patterns or insights can be drawn from these mood entries?";
             const systemMessage: ChatCompletionSystemMessageParam = {
@@ -120,9 +110,50 @@ export const moodRouter = createTRPCRouter({
                 messages: [systemMessage]
             })
 
-            console.log("response check now->", response)
             const message = response.choices[0].message
             console.log("message ->", message)
             return message;
+        }),
+    getMoodStatisticTime: protectedProcedure.input(z.object({ timeFrame: z.number() })).query(async (opts) => {
+        let userId = 1;
+        const timeFrame = ["WEEKLY", "MONTHLY", "YEARLY"]
+        const currentFrame = timeFrame[opts.input.timeFrame]
+        const { start, end } = getTimeFrameDate(currentFrame)
+
+        const allMoodsFromSpecificTimeFrame = await db
+            .selectFrom('moods')
+            .selectAll()
+            .where('userId', '=', userId)
+            .where('createdAt', '>=', start)
+            .where('createdAt', '<=', end)
+            .execute();
+        const moodTallies: any = {
+            Awful: { sum: 0, count: 0 },
+            Bad: { sum: 0, count: 0 },
+            Ok: { sum: 0, count: 0 },
+            Good: { sum: 0, count: 0 },
+            Great: { sum: 0, count: 0 },
+        };
+        allMoodsFromSpecificTimeFrame.forEach(mood => {
+            const moodType = formatPointToMood(mood.moodScore);
+            if (moodTallies[moodType] !== undefined) {
+                moodTallies[moodType].sum += mood.moodScore;
+                moodTallies[moodType].count += 1;
+            }
+        });
+        const averageMoods = Object.keys(moodTallies).map(moodType => {
+            const tally = moodTallies[moodType];
+            return {
+                mood: moodType,
+                average: tally.count,
+            };
+        });
+        const filterMoods = allMoodsFromSpecificTimeFrame.map((mood) => {
+            return {
+                ...mood,
+                createdAt: formatDateWithDay(mood.createdAt?.toString())
+            }
         })
+        return { filterMoods, averageMoods }
+    })
 });

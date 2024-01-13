@@ -56,15 +56,15 @@ export default function asyncUserForm() {
 
   return (
     <>
-      {1 < 0 && <div className="flex h-auto flex-col items-center gap-12">
+      <div className="flex h-auto flex-col items-center gap-12">
         <div className="text-4xl text-black font-bold items-center">WELCOME {user?.name}</div>
         <div className="text-2xl text-black font-bold items-center"> HOW IS YOUR MOOD TODAY?</div>
         <div className="flex gap-2">
-          <Button onClick={() => { handleMoodClick(MOODS[0]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[0] === selectedMood && 'bg-blue-200')}>GREAT</Button>
-          <Button onClick={() => { handleMoodClick(MOODS[1]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[1] === selectedMood && 'bg-blue-200')}>GOOD</Button>
-          <Button onClick={() => { handleMoodClick(MOODS[2]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[2] === selectedMood && 'bg-blue-200')}>OKAY</Button>
-          <Button onClick={() => { handleMoodClick(MOODS[3]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[3] === selectedMood && 'bg-blue-200')}>BAD</Button>
-          <Button onClick={() => { handleMoodClick(MOODS[4]) }} className={twMerge('bg-blue-50 text-3xl font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[4] === selectedMood && 'bg-blue-200')}>AWFUL</Button>
+          <Button onClick={() => { handleMoodClick(MOODS[0]) }} className={twMerge('bg-blue-50 text-3xl h-full font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[0] === selectedMood && 'bg-blue-200')}>GREAT</Button>
+          <Button onClick={() => { handleMoodClick(MOODS[1]) }} className={twMerge('bg-blue-50 text-3xl h-full font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[1] === selectedMood && 'bg-blue-200')}>GOOD</Button>
+          <Button onClick={() => { handleMoodClick(MOODS[2]) }} className={twMerge('bg-blue-50 text-3xl h-full font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[2] === selectedMood && 'bg-blue-200')}>OKAY</Button>
+          <Button onClick={() => { handleMoodClick(MOODS[3]) }} className={twMerge('bg-blue-50 text-3xl h-full font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[3] === selectedMood && 'bg-blue-200')}>BAD</Button>
+          <Button onClick={() => { handleMoodClick(MOODS[4]) }} className={twMerge('bg-blue-50 text-3xl h-full font-medium p-4 rounded-md w-3/4 hover:bg-blue-200 transition-colors delay-100 ease-in-out', MOODS[4] === selectedMood && 'bg-blue-200')}>AWFUL</Button>
         </div>
         <Activites />
         <Weather />
@@ -72,8 +72,8 @@ export default function asyncUserForm() {
         <Input onChange={(e) => { setNotes(e.target.value) }} value={notes} className="w-full h-full p-4" type="text" placeholder="Explain more about your mood today" />
         <Button onClick={() => { handleSubmit() }}>SUBMIT</Button>
         <Button onClick={() => { signOut() }}>SIGNOUT</Button>
-      </div >}
-      <Statistic />
+      </div>
+      {/* <Statistic /> */}
     </>
   );
 }

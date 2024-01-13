@@ -3,11 +3,10 @@ import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { z } from "zod";
 import openai, { getEmbedding } from "@/utils/ai/openai";
 import { pineconeIndex } from "@/utils/db/pinecone";
-import { ChatCompletion, ChatCompletionMessage, ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
-import { OpenAIStream, StreamingTextResponse } from 'ai';
-import { formatMoodToPoint, formatPointToMood } from "@/lib/utils/formatMood";
-import { formatDateWithDay } from "@/lib/utils/formatDate";
-import { getLastWeekDates, getTimeFrameDate } from "@/lib/utils/getLatestDate";
+import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
+import { formatPointToMood } from "@/lib/utils/formatMood";
+import { formatDateWithDay, getMonthName } from "@/lib/utils/formatDate";
+import { getStartAndEndDate, getTimeMonthlyFrameDate, getTimeWeeklyFrameDate } from "@/lib/utils/getLatestDate";
 
 export const moodRouter = createTRPCRouter({
     createMood: protectedProcedure
@@ -72,7 +71,12 @@ export const moodRouter = createTRPCRouter({
             })
         }),
     getDailyMoodReflectionAndMotivation:
-        protectedProcedure.input(z.object({ userId: z.number() })).query(async (opts) => {
+        protectedProcedure.input(z.object({ userId: z.number(), timeFrame: z.number() })).query(async (opts) => {
+            const timeFrameList = ["WEEKLY", "MONTHLY"]
+            const timeFrame = timeFrameList[opts.input.timeFrame - 1]
+            const { start, end } = getStartAndEndDate(timeFrame)
+            console.log("start ->", start)
+            console.log("end ->", end)
             const mostCommonMoods = await db.selectFrom('moods')
                 .select('userId')
                 .select('moodScore')
@@ -80,6 +84,9 @@ export const moodRouter = createTRPCRouter({
                 .select('activities')
                 .select('sleepQuality')
                 .select((eb) => eb.fn.countAll().as("occurrences"))
+                .where('createdAt', '>=', start) // add this line
+                .where('createdAt', '<=', end)   // and this line
+                .where('userId', '=', opts.input.userId)
                 .groupBy('userId')
                 .groupBy('moodScore')
                 .groupBy('weather')
@@ -89,20 +96,36 @@ export const moodRouter = createTRPCRouter({
                 .limit(1)
                 .execute();
 
+            const allMoodsWeekly = await db
+                .selectFrom('moods')
+                .selectAll()
+                .where('userId', '=', opts.input.userId)
+                .where('createdAt', '>=', start)
+                .where('createdAt', '<=', end)
+                .execute();
+
+            console.log("allMoodsWeekly ->", allMoodsWeekly)
+
             const embedding = await getEmbedding(mostCommonMoods[0])
             const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 4, filter: { userId: opts.input.userId } })
             const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).execute()
             const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
+
             const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
-            let prompt = `As a mood analyzer, provide a very short yet insightful summary focusing on key patterns in mood based on the following data. Based on the following mood data, please provide a comprehensive summary and analysis. The most common mood combination is a mood score of ${mostCommonMoods[0].moodScore}, with activities like ${mostCommonMoods[0].activities}, in ${mostCommonMoods[0].weather} weather, and '${mostCommonMoods[0].sleepQuality} Sleep'. Similar mood entries include:\n`;
+            let prompt = `As a mood analyzer, provide a concise summary of key mood patterns for a ${timeFrame} time frame. 
+            The predominant mood pattern is a score of ${mostCommonMoods[0].moodScore}, associated with activities 
+            ike ${mostCommonMoods[0].activities}, ${mostCommonMoods[0].weather} weather, 
+            and '${mostCommonMoods[0].sleepQuality}' sleep. Recent mood entries:\n`;
             matchedMoods.forEach(entry => {
-                prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}, Notes: ${entry.notes || 'None'}`;
+                prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
             });
-            prompt += "What patterns or insights can be drawn from these mood entries?";
+            prompt += "Identify key trends and insights from these mood entries in a brief summary.";
             const systemMessage: ChatCompletionSystemMessageParam = {
                 role: "system",
                 content: prompt
             }
+
+            console.log("prompt ->", prompt)
 
             const response = await openai.chat.completions.create({
                 model: "gpt-3.5-turbo",
@@ -111,22 +134,12 @@ export const moodRouter = createTRPCRouter({
             })
 
             const message = response.choices[0].message
-            console.log("message ->", message)
             return message;
         }),
     getMoodStatisticTime: protectedProcedure.input(z.object({ timeFrame: z.number() })).query(async (opts) => {
         let userId = 1;
-        const timeFrame = ["WEEKLY", "MONTHLY", "YEARLY"]
-        const currentFrame = timeFrame[opts.input.timeFrame]
-        const { start, end } = getTimeFrameDate(currentFrame)
-
-        const allMoodsFromSpecificTimeFrame = await db
-            .selectFrom('moods')
-            .selectAll()
-            .where('userId', '=', userId)
-            .where('createdAt', '>=', start)
-            .where('createdAt', '<=', end)
-            .execute();
+        const timeFrameList = ["WEEKLY", "MONTHLY"]
+        const currentFrame = timeFrameList[opts.input.timeFrame - 1]
         const moodTallies: any = {
             Awful: { sum: 0, count: 0 },
             Bad: { sum: 0, count: 0 },
@@ -134,26 +147,83 @@ export const moodRouter = createTRPCRouter({
             Good: { sum: 0, count: 0 },
             Great: { sum: 0, count: 0 },
         };
-        allMoodsFromSpecificTimeFrame.forEach(mood => {
-            const moodType = formatPointToMood(mood.moodScore);
-            if (moodTallies[moodType] !== undefined) {
-                moodTallies[moodType].sum += mood.moodScore;
-                moodTallies[moodType].count += 1;
+        let statistics = [];
+        let averageMoods;
+
+        const { start, end } = getTimeWeeklyFrameDate(currentFrame)
+        if (currentFrame === 'WEEKLY') {
+            const allMoodsWeekly = await db
+                .selectFrom('moods')
+                .selectAll()
+                .where('userId', '=', userId)
+                .where('createdAt', '>=', start)
+                .where('createdAt', '<=', end)
+                .execute();
+
+            allMoodsWeekly.forEach(mood => {
+                const moodType = formatPointToMood(mood.moodScore);
+                if (moodTallies[moodType] !== undefined) {
+                    moodTallies[moodType].sum += mood.moodScore;
+                    moodTallies[moodType].count += 1;
+                }
+            });
+            averageMoods = Object.keys(moodTallies).map(moodType => {
+                const tally = moodTallies[moodType];
+                return {
+                    mood: moodType,
+                    average: tally.count,
+                };
+            });
+            const moods = allMoodsWeekly.map((mood) => {
+                return {
+                    ...mood,
+                    createdAt: formatDateWithDay(mood.createdAt?.toString()),
+                }
+            })
+            statistics.push({
+                moods,
+                averageMoods
+            })
+        }
+        else if (currentFrame === 'MONTHLY') {
+            const monthlyTimeFrames = getTimeMonthlyFrameDate(currentFrame)
+            const moods = []
+            for (const frame of monthlyTimeFrames) {
+                const allMoodsMonthly = await db
+                    .selectFrom('moods')
+                    .selectAll()
+                    .where('userId', '=', userId)
+                    .where('createdAt', '>=', frame.start)
+                    .where('createdAt', '<=', frame.end)
+                    .execute();
+
+                let sum = 0;
+                allMoodsMonthly.forEach(mood => {
+                    sum += mood.moodScore;
+                });
+
+                allMoodsMonthly.forEach(mood => {
+                    const moodType = formatPointToMood(mood.moodScore);
+                    if (moodTallies[moodType] !== undefined) {
+                        moodTallies[moodType].sum += mood.moodScore;
+                        moodTallies[moodType].count += 1;
+                    }
+                });
+                averageMoods = Object.keys(moodTallies).map(moodType => {
+                    const tally = moodTallies[moodType];
+                    return {
+                        mood: moodType,
+                        average: tally.count,
+                    };
+                });
+                const average = allMoodsMonthly.length > 0 ? sum / allMoodsMonthly.length : null;
+                moods.push({ moodScore: average, createdAt: getMonthName(frame.start.getMonth() + 1) })
+                statistics.push({
+                    moods,
+                    averageMoods
+                });
             }
-        });
-        const averageMoods = Object.keys(moodTallies).map(moodType => {
-            const tally = moodTallies[moodType];
-            return {
-                mood: moodType,
-                average: tally.count,
-            };
-        });
-        const filterMoods = allMoodsFromSpecificTimeFrame.map((mood) => {
-            return {
-                ...mood,
-                createdAt: formatDateWithDay(mood.createdAt?.toString())
-            }
-        })
-        return { filterMoods, averageMoods }
+        }
+        return { statistics }
     })
 });

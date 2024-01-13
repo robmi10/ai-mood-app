@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/lib/components/ui/button";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { twMerge } from 'tailwind-merge'
 import MoodContext from "./context/MoodContext";
 

@@ -7,8 +7,9 @@ type Props = {
 }
 
 export default function AreaCharts({ data }: Props) {
-    const areadata = data.map((mood: any) => {
-        console.log("mood ->", mood)
+
+    console.log("areacharts data ->", data[0].moods)
+    const areadata = data[0].moods.map((mood: any) => {
         return {
             name: mood.createdAt.substr(0, 3),
             value: mood.moodScore

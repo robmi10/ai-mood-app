@@ -18,7 +18,10 @@ export default function asyncUserForm() {
     setSelectedWeather, selectedActivity, setSelectedActivity } = useContext(MoodContext);
   const getUsers = api.users.getUsers.useQuery();
   const user = getUsers?.data?.users[0]
+  const todayAnswer = api.mood.getUserHasAlreadyAnsweredToday.useQuery({ userId: user?.id })
+  const hasUserAnsweredToday = todayAnswer.isSuccess && todayAnswer?.data?.hasUserAlreadyAnsweredForToday
 
+  console.log("hasUserAnsweredToday ->", hasUserAnsweredToday)
   const MOODS = [
     'GREAT',
     'GOOD',
@@ -56,7 +59,7 @@ export default function asyncUserForm() {
 
   return (
     <>
-      <div className="flex h-auto flex-col items-center gap-12">
+      {!hasUserAnsweredToday && <div className="flex h-auto flex-col items-center gap-12">
         <div className="text-4xl text-black font-bold items-center">WELCOME {user?.name}</div>
         <div className="text-2xl text-black font-bold items-center"> HOW IS YOUR MOOD TODAY?</div>
         <div className="flex gap-2">
@@ -72,8 +75,9 @@ export default function asyncUserForm() {
         <Input onChange={(e) => { setNotes(e.target.value) }} value={notes} className="w-full h-full p-4" type="text" placeholder="Explain more about your mood today" />
         <Button onClick={() => { handleSubmit() }}>SUBMIT</Button>
         <Button onClick={() => { signOut() }}>SIGNOUT</Button>
-      </div>
-      {/* <Statistic /> */}
+      </div>}
+      {hasUserAnsweredToday && <h1>Thanks for the provided answer to check on your statistic you can go to the analyze page..</h1>}
+      <Statistic />
     </>
   );
 }

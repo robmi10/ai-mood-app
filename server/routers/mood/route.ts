@@ -28,8 +28,10 @@ export const moodRouter = createTRPCRouter({
                 .limit(1)
                 .executeTakeFirst();
 
+            console.log("latestMoodId ->", latestMoodId)
             const moodId = latestMoodId ? Number(latestMoodId.id) + 1 : 0
 
+            console.log("moodId ->", moodId)
             await db.transaction().execute(async (trx) => {
                 try {
                     trx.insertInto("moods").values({
@@ -77,64 +79,63 @@ export const moodRouter = createTRPCRouter({
             const { start, end } = getStartAndEndDate(timeFrame)
             console.log("start ->", start)
             console.log("end ->", end)
-            const mostCommonMoods = await db.selectFrom('moods')
-                .select('userId')
+            console.log("timeFrame ->", timeFrame)
+            const mostCommonMoodScore = await db.selectFrom('moods')
                 .select('moodScore')
-                .select('weather')
-                .select('activities')
-                .select('sleepQuality')
                 .select((eb) => eb.fn.countAll().as("occurrences"))
-                .where('createdAt', '>=', start) // add this line
-                .where('createdAt', '<=', end)   // and this line
+                .where('createdAt', '>=', start)
+                .where('createdAt', '<=', end)
                 .where('userId', '=', opts.input.userId)
-                .groupBy('userId')
                 .groupBy('moodScore')
-                .groupBy('weather')
-                .groupBy('activities')
-                .groupBy('sleepQuality')
                 .orderBy('occurrences', 'desc')
                 .limit(1)
                 .execute();
-
-            const allMoodsWeekly = await db
-                .selectFrom('moods')
+            const associatedDataForMoodScore = await db.selectFrom('moods')
                 .selectAll()
-                .where('userId', '=', opts.input.userId)
+                .where('moodScore', '=', mostCommonMoodScore[0].moodScore)
                 .where('createdAt', '>=', start)
                 .where('createdAt', '<=', end)
+                .where('userId', '=', opts.input.userId)
                 .execute();
 
-            console.log("allMoodsWeekly ->", allMoodsWeekly)
+            console.log("mostCommonMoodScore ->", mostCommonMoodScore)
+            console.log("associatedDataForMoodScore ->", associatedDataForMoodScore)
 
-            const embedding = await getEmbedding(mostCommonMoods[0])
-            const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 4, filter: { userId: opts.input.userId } })
-            const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).execute()
-            const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
+            // const embedding = await getEmbedding(mostCommonMoods[0])
+            // const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 5, filter: { userId: opts.input.userId } })
+            // const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).where('createdAt', '>=', start)
+            //     .where('createdAt', '<=', end).execute()
+            // const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
 
-            const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
-            let prompt = `As a mood analyzer, provide a concise summary of key mood patterns for a ${timeFrame} time frame. 
-            The predominant mood pattern is a score of ${mostCommonMoods[0].moodScore}, associated with activities 
-            ike ${mostCommonMoods[0].activities}, ${mostCommonMoods[0].weather} weather, 
-            and '${mostCommonMoods[0].sleepQuality}' sleep. Recent mood entries:\n`;
-            matchedMoods.forEach(entry => {
-                prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
-            });
-            prompt += "Identify key trends and insights from these mood entries in a brief summary.";
-            const systemMessage: ChatCompletionSystemMessageParam = {
-                role: "system",
-                content: prompt
-            }
+            // console.log("pineconeIds ->", pineconeIds)
+            // // console.log("allMoodsFromUser ->", allMoodsFromUser)
 
-            console.log("prompt ->", prompt)
+            // const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
 
-            const response = await openai.chat.completions.create({
-                model: "gpt-3.5-turbo",
-                stream: false,
-                messages: [systemMessage]
-            })
+            // console.log("matchedMoods pinecone ->", matchedMoods)
+            // let prompt = `As a mood analyzer, provide a concise summary of key mood patterns for a ${timeFrame} time frame. 
+            // The predominant mood pattern is a score of ${mostCommonMoods[0].moodScore}, associated with activities 
+            // ike ${mostCommonMoods[0].activities}, ${mostCommonMoods[0].weather} weather, 
+            // and '${mostCommonMoods[0].sleepQuality}' sleep. Recent mood entries:\n`;
+            // matchedMoods.forEach(entry => {
+            //     prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
+            // });
+            // prompt += "Identify key trends and insights from these mood entries in a brief summary.";
+            // const systemMessage: ChatCompletionSystemMessageParam = {
+            //     role: "system",
+            //     content: prompt
+            // }
 
-            const message = response.choices[0].message
-            return message;
+            // console.log("prompt ->", prompt)
+
+            // const response = await openai.chat.completions.create({
+            //     model: "gpt-3.5-turbo",
+            //     stream: false,
+            //     messages: [systemMessage]
+            // })
+
+            // const message = response.choices[0].message
+            return true;
         }),
     getMoodStatisticTime: protectedProcedure.input(z.object({ timeFrame: z.number() })).query(async (opts) => {
         let userId = 1;
@@ -225,5 +226,22 @@ export const moodRouter = createTRPCRouter({
             }
         }
         return { statistics }
+    }),
+    getUserHasAlreadyAnsweredToday: protectedProcedure.input(z.object({ userId: z.number() })).query(async (opts) => {
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const todaysMood =
+            await db.selectFrom("moods")
+                .selectAll().where('userId', '=', opts.input.userId)
+                .where('createdAt', '>=', today)
+                .execute();
+
+        console.log("todaysMood ->", todaysMood)
+        const hasUserAlreadyAnsweredForToday = todaysMood.length > 0
+
+        console.log("hasUserAlreadyAnsweredForToday ->", hasUserAlreadyAnsweredForToday)
+        return { hasUserAlreadyAnsweredForToday }
     })
 });

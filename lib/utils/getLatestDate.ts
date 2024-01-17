@@ -27,8 +27,8 @@ export const getStartAndEndDate = (period: string) => {
         start = new Date(now.getFullYear(), now.getMonth(), 1);
         end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     } else if (period === 'WEEKLY') {
-        start = new Date(now.setDate(now.getDate() - now.getDay()));
-        end = new Date(now.setDate(now.getDate() - now.getDay() + 7));
+        start = new Date(now.setDate(now.getDate() - now.getDay() - 7));
+        end = new Date(now.setDate(start.getDate() + 7));
     } else {
         throw new Error('Invalid period. Please choose "week" or "month".');
     }

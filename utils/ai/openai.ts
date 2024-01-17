@@ -14,7 +14,7 @@ export async function getEmbedding(moodEntry: any) {
     console.log("inside getEmbedding", moodEntry)
     const text = `Mood Score: ${moodEntry.moodScore}. ` +
         `Notes: ${moodEntry?.notes}. ` +
-        // `Activities: ${moodEntry.activities.join(', ')}. ` +
+        `Activities: ${moodEntry.activities.join(', ')}. ` +
         `Weather: ${moodEntry.weather}. ` +
         `Sleep Quality: ${moodEntry.sleepQuality}.`;
 

@@ -101,41 +101,67 @@ export const moodRouter = createTRPCRouter({
             console.log("mostCommonMoodScore ->", mostCommonMoodScore)
             console.log("associatedDataForMoodScore ->", associatedDataForMoodScore)
 
-            // const embedding = await getEmbedding(mostCommonMoods[0])
-            // const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 5, filter: { userId: opts.input.userId } })
-            // const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).where('createdAt', '>=', start)
-            //     .where('createdAt', '<=', end).execute()
-            // const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
+            const combinationCounts: any = {};
 
-            // console.log("pineconeIds ->", pineconeIds)
-            // // console.log("allMoodsFromUser ->", allMoodsFromUser)
+            associatedDataForMoodScore.forEach(entry => {
+                const activitiesStr = entry.activities ? entry.activities.join('-') : 'NoActivities';
+                const key = `${entry.notes || 'None'}-${activitiesStr}-${entry.weather}-${entry.sleepQuality}`;
 
-            // const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
+                if (!combinationCounts[key]) {
+                    combinationCounts[key] = { count: 0, data: entry };
+                }
+                combinationCounts[key].count++;
+            });
 
-            // console.log("matchedMoods pinecone ->", matchedMoods)
-            // let prompt = `As a mood analyzer, provide a concise summary of key mood patterns for a ${timeFrame} time frame. 
-            // The predominant mood pattern is a score of ${mostCommonMoods[0].moodScore}, associated with activities 
-            // ike ${mostCommonMoods[0].activities}, ${mostCommonMoods[0].weather} weather, 
-            // and '${mostCommonMoods[0].sleepQuality}' sleep. Recent mood entries:\n`;
-            // matchedMoods.forEach(entry => {
-            //     prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
-            // });
-            // prompt += "Identify key trends and insights from these mood entries in a brief summary.";
-            // const systemMessage: ChatCompletionSystemMessageParam = {
-            //     role: "system",
-            //     content: prompt
-            // }
+            // Determine the most frequent combination
+            let mostFrequentEntry: any = {};
+            let maxCount = 0;
 
-            // console.log("prompt ->", prompt)
+            Object.values(combinationCounts).forEach(combination => {
+                if (combination.count > maxCount) {
+                    maxCount = combination.count;
+                    mostFrequentEntry = combination.data;
+                }
+            });
 
-            // const response = await openai.chat.completions.create({
-            //     model: "gpt-3.5-turbo",
-            //     stream: false,
-            //     messages: [systemMessage]
-            // })
+            console.log("Most common combination:", mostFrequentEntry);
 
-            // const message = response.choices[0].message
-            return true;
+
+            const embedding = await getEmbedding(mostFrequentEntry)
+            const vectorMoodFilter = await pineconeIndex.query({ vector: embedding, topK: 2, filter: { userId: opts.input.userId } })
+            const allMoodsFromUser = await db.selectFrom("moods").selectAll().where("userId", '=', opts.input.userId).where('createdAt', '>=', start)
+                .where('createdAt', '<=', end).execute()
+            const pineconeIds = vectorMoodFilter.matches.map(match => match.id);
+
+            console.log("pineconeIds ->", pineconeIds)
+
+            const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
+
+            console.log("matchedMoods pinecone ->", matchedMoods)
+            let prompt = `As a mood analyzer, provide a concise summary of key mood patterns for a ${timeFrame} time frame. 
+            The predominant mood pattern is a score of ${mostFrequentEntry.moodScore}, associated with activities 
+            ike ${mostFrequentEntry.activities}, ${mostFrequentEntry.weather} weather, 
+            and '${mostFrequentEntry.sleepQuality}' sleep. Recent mood entries:\n`;
+            matchedMoods.forEach(entry => {
+                prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
+            });
+            prompt += "Identify key trends and insights from these mood entries in a brief summary.";
+            const systemMessage: ChatCompletionSystemMessageParam = {
+                role: "system",
+                content: prompt
+            }
+
+            console.log("prompt ->", prompt)
+
+            const response = await openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                stream: false,
+                messages: [systemMessage]
+            })
+
+            const message = response.choices[0].message
+            console.log("message ->", message)
+            return message;
         }),
     getMoodStatisticTime: protectedProcedure.input(z.object({ timeFrame: z.number() })).query(async (opts) => {
         let userId = 1;

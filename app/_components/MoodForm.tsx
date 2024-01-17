@@ -49,6 +49,10 @@ export default function asyncUserForm() {
     createDailyMood.mutate({
       userId: user?.id || 2, moodScore: moodScore(selectedMood),
       notes: notes, activities: selectedActivity, sleepQuality: selectedSleep, weather: selectedWeather
+    }, {
+      onSuccess() {
+        todayAnswer.refetch()
+      }
     })
   }
 

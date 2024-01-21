@@ -27,7 +27,7 @@ export default function Mood() {
     };
 
     return (
-        <div className="flex h-auto flex-col items-center gap-12">
+        <div className="flex h-auto flex-col items-center">
             <div className="flex gap-2">
                 <Button onClick={() => { handleMoodClick(MOODS[0]) }} className={twMerge('bg-blue-200 text-3xl h-full font-normal p-4 rounded-full shadow-lg w-3/4 hover:bg-blue-400 transition-colors delay-100 ease-in-out', MOODS[0] === selectedMood && 'bg-blue-400')}>GREAT</Button>
                 <Button onClick={() => { handleMoodClick(MOODS[1]) }} className={twMerge('bg-blue-200 text-3xl h-full font-normal p-4 rounded-full shadow-lg w-3/4 hover:bg-blue-400 transition-colors delay-100 ease-in-out', MOODS[1] === selectedMood && 'bg-blue-400')}>GOOD</Button>

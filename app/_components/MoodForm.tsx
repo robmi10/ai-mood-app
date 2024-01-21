@@ -4,6 +4,7 @@ import { Button } from "@/lib/components/ui/button";
 import { useContext, useState } from "react";
 import { signOut } from 'next-auth/react';
 import { Input } from "@/lib/components/ui/input";
+import { BouncerLoader } from './animation/Bouncer'
 import Activites from "./Activites";
 import Weather from "./Weather";
 import Sleep from "./Sleep";
@@ -45,12 +46,11 @@ export default function asyncUserForm() {
     })
   }
 
-  if (todayAnswer.isLoading) { return <div>LOADING...</div> }
-
+  if (todayAnswer.isLoading) { return <div className='h-screen flex justify-center items-center'><BouncerLoader /></div> }
 
   return (
     <>
-      {!hasUserAnsweredToday && <div className="flex h-auto flex-col gap-12 items-center w-3/6">
+      {!hasUserAnsweredToday && <div className="flex h-auto flex-col gap-8 items-center w-3/6">
         <div className="w-full space-y-8">
           <div className="text-4xl text-white font-bold items-center">{user?.name} How Are You Feeling Today? </div>
           <div className="text-2xl text-white font-bold items-center"> Just take a moment to reflect on your day. Select the mood that resonates with you currently.</div>
@@ -59,12 +59,13 @@ export default function asyncUserForm() {
         <Activites />
         <Weather />
         <Sleep />
-        <Input onChange={(e) => { setNotes(e.target.value) }} value={notes} className="w-full h-full p-4" type="text" placeholder="Explain more about your mood today" />
-        <Button onClick={() => { handleSubmit() }}>SUBMIT</Button>
-        <Button onClick={() => { signOut() }}>SIGNOUT</Button>
+        <Input onChange={(e) => { setNotes(e.target.value) }} value={notes} className="w-full h-full p-4 bg-white rounded-xl shadow-lg border-none" type="text" placeholder="Explain more about your mood today" />
+        <div className="space-x-2 bg-red w-full flex justify-end">
+          <Button className="bg-white w-24 rounded-xl shadow-lg" onClick={() => { handleSubmit() }}>SUBMIT</Button>
+          <Button className="bg-black text-white w-24 rounded-xl shadow-lg" onClick={() => { signOut() }}>SIGNOUT</Button>
+        </div>
       </div>}
-      {hasUserAnsweredToday && <h1>Thanks for the provided answer to check on your statistic you can go to the analyze page..</h1>}
-      <Statistic />
+      {hasUserAnsweredToday && <Statistic />}
     </>
   );
 }

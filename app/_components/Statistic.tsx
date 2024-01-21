@@ -12,6 +12,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Button } from '@/lib/components/ui/button'
+import { WordByWordRenderer } from './animation/WordAnimation'
 
 const Statistic = () => {
     const [timeFrame, setTimeFrame] = useState(1)
@@ -33,30 +34,35 @@ const Statistic = () => {
         setReflectionMood(true)
     }
 
-    console.log("timeFrame ->", timeFrame)
     return (
-        <div className='flex flex-col w-full items-center'>
-            <h1>STATISTIC</h1>
-            <div className='mb-24'>
-                <Select onValueChange={(value) => { setTimeFrame(Number(value)), setReflectionMood(false) }}>
-                    <SelectTrigger className="w-[280px]">
-                        <SelectValue placeholder="Select a time frame" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {timeFrameSelect.map((time, i) => (
-                            <SelectItem key={i} value={time.value.toString()}>{time.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+        <div className='space-y-8 w-full flex flex-col items-center'>
+            <div className='flex h-auto flex-col gap-4 w-3/6'>
+                <div className="w-full space-y-4 flex flex-col">
+                    <span className='text-4xl text-white font-bold items-center'>Thank You for Logging Your Mood!</span>
+                    <span className='text-2xl text-white font-bold items-center'>Your mood is logged. Discover patterns and insights for a healthier emotional life.</span>
+                </div>
+                <div className='mb-12 z-'>
+                    <Select onValueChange={(value) => { setTimeFrame(Number(value)), setReflectionMood(false) }}>
+                        <span className='text-white text-xl font-bold mb-2'> Choose Timeframe</span>
+                        <SelectTrigger className="w-[280px] bg-white rounded-xl border-none">
+                            <SelectValue defaultValue={timeFrameSelect[0].value} placeholder={timeFrameSelect[0].label} />
+                        </SelectTrigger>
+                        <SelectContent className='bg-white rounded-xl'>
+                            {timeFrameSelect.map((time, i) => (
+                                <SelectItem className='hover:cursor-pointer hover:bg-blue-500' key={i} value={time.value.toString()}>{time.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
-            <div className='mb-24'>
-                {!reflectionMood && <Button onClick={handleMoodReflection} className="border p-2 bg-blue-50 hover:bg-blue-100">GET A MOOD SUMMARY FROM THE LAST {timeFrame === 1 ? 'WEEK' : 'MONTH'}</Button>}
-                {getMostCommonMoodCombo.isLoading && <h1>LOADING.... </h1>}
-                {reflectionMood && aiRespone && <div className="text-bold text-black font-medium items-center">{aiRespone}</div>}
-            </div>
-            <div className='w-full flex items-center'>
+            <div className='w-7/12 flex items-center'>
                 {timeFrameMoodStatistic && <AreaCharts data={timeFrameMoodStatistic} />}
                 {timeFrameMoodStatistic && <PieCharts data={timeFrameMoodStatistic} />}
+            </div>
+            <div className='mb-12 w-3/6 flex items-center mt-8'>
+                {!reflectionMood && <Button onClick={handleMoodReflection} className="bg-white p-2 rounded-xl shadow-lg hover:bg-slate-100 transition-colors ease-in-out duration-75">GET A MOOD SUMMARY FROM THE LAST {timeFrame === 1 ? 'WEEK' : 'MONTH'}</Button>}
+                {getMostCommonMoodCombo.isLoading && <h1 className='animate-pulse bg-white w-4 h-4 rounded-full' />}
+                {reflectionMood && aiRespone && <WordByWordRenderer delay={150} text={aiRespone} />}
             </div>
         </div>
     )

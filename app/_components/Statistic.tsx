@@ -3,7 +3,6 @@ import { api } from '@/lib/api'
 import AreaCharts from '@/lib/components/ui/barcharts'
 import PieCharts from '@/lib/components/ui/piechart'
 import React, { useState } from 'react'
-
 import {
     Select,
     SelectContent,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/select"
 import { Button } from '@/lib/components/ui/button'
 import { WordByWordRenderer } from './animation/WordAnimation'
+import { SelectGroup } from '@radix-ui/react-select'
 
 const Statistic = () => {
     const [timeFrame, setTimeFrame] = useState(1)
@@ -42,14 +42,16 @@ const Statistic = () => {
                     <span className='text-2xl text-white font-bold items-center'>Your mood is logged. Discover patterns and insights for a healthier emotional life.</span>
                 </div>
                 <div className='mb-12 z-'>
-                    <Select onValueChange={(value) => { setTimeFrame(Number(value)), setReflectionMood(false) }}>
+                    <Select defaultValue={timeFrameSelect[0].value.toString()} onValueChange={(value) => { setTimeFrame(Number(value)), setReflectionMood(false) }}>
                         <span className='text-white text-xl font-bold mb-2'> Choose Timeframe</span>
                         <SelectTrigger className="w-[280px] bg-white rounded-xl border-none">
-                            <SelectValue defaultValue={timeFrameSelect[0].value} placeholder={timeFrameSelect[0].label} />
+                            <SelectValue placeholder={timeFrameSelect[0].label} />
                         </SelectTrigger>
-                        <SelectContent className='bg-white rounded-xl'>
+                        <SelectContent className='rounded-xl bg-white'>
                             {timeFrameSelect.map((time, i) => (
-                                <SelectItem className='hover:cursor-pointer hover:bg-blue-500' key={i} value={time.value.toString()}>{time.label}</SelectItem>
+                                <SelectGroup>
+                                    <SelectItem className='hover:cursor-pointer hover:bg-blue-500' key={i} value={time.value.toString()}>{time.label}</SelectItem>
+                                </SelectGroup>
                             ))}
                         </SelectContent>
                     </Select>

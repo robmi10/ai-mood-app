@@ -11,7 +11,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body className="bg-red-300 h-full w-full">
         <NextAuthProvider>
           <Provider>
             <MoodProvider>

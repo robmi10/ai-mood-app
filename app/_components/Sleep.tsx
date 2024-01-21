@@ -21,9 +21,9 @@ export default function Sleep() {
     return (
         <div className="flex h-auto flex-col items-center gap-12">
             <div className="flex gap-2">
-                <Button onClick={() => { handleMoodClick(SLEEP[0]) }} className={twMerge('bg-yellow-50 text-xl h-full font-medium p-4 rounded-full w-42 hover:bg-yellow-200 transition-colors delay-100 ease-in-out', selectedSleep === SLEEP[0] && 'bg-yellow-200')}>GOOD SLEEP</Button>
-                <Button onClick={() => { handleMoodClick(SLEEP[1]) }} className={twMerge('bg-yellow-50 text-xl h-full font-medium p-4 rounded-full w-42 hover:bg-yellow-200 transition-colors delay-100 ease-in-out', selectedSleep === SLEEP[1] && 'bg-yellow-200')}>OK SLEEP</Button>
-                <Button onClick={() => { handleMoodClick(SLEEP[2]) }} className={twMerge('bg-yellow-50 text-xl h-full font-medium p-4 rounded-full w-42 hover:bg-yellow-200 transition-colors delay-100 ease-in-out', selectedSleep === SLEEP[2] && 'bg-yellow-200')}>BAD SLEEP</Button>
+                <Button onClick={() => { handleMoodClick(SLEEP[0]) }} className={twMerge('bg-pink-200 text-xl h-full font-medium p-4 rounded-full w-42 hover:bg-pink-400 transition-colors delay-100 ease-in-out', selectedSleep === SLEEP[0] && 'bg-pink-400')}>GOOD SLEEP</Button>
+                <Button onClick={() => { handleMoodClick(SLEEP[1]) }} className={twMerge('bg-pink-200 text-xl h-full font-medium p-4 rounded-full w-42 hover:bg-pink-400 transition-colors delay-100 ease-in-out', selectedSleep === SLEEP[1] && 'bg-pink-400')}>OK SLEEP</Button>
+                <Button onClick={() => { handleMoodClick(SLEEP[2]) }} className={twMerge('bg-pink-200 text-xl h-full font-medium p-4 rounded-full w-42 hover:bg-pink-400 transition-colors delay-100 ease-in-out', selectedSleep === SLEEP[2] && 'bg-pink-400')}>BAD SLEEP</Button>
             </div>
         </div >
     );

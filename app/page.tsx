@@ -10,7 +10,7 @@ export default async function Home() {
   const session = await getServerSession();
 
   if (!session) return <div className="flex items-center justify-center flex-col h-screen gap-8 ">
-    <div className="h-2/4 flex flex-col justify-between w-8/12 md:w-6/12">
+    <div className="h-2/4 flex flex-col justify-between w-8/12 md:w-6/12 animate-fadeSmooth">
       <div className="space-y-8 text-white">
         <h1 className="text-2xl md:text-5xl font-bold">Embrace Your Feelings, Transform Your Days</h1>
         <h1 className="text-xl md:text-2xl font-bold">Sign in to unlock insights into your mood and wellbeing</h1>

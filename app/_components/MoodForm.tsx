@@ -49,7 +49,7 @@ export default function asyncUserForm() {
 
   return (
     <>
-      {!hasUserAnsweredToday && <div className="flex h-auto flex-col gap-8 items-center w-full mt-8 md:w-3/6">
+      {!hasUserAnsweredToday && <div className="flex h-auto flex-col gap-8 items-center w-full mt-8 md:w-3/6 animate-fadeIn">
         <div className="w-full space-y-8">
           <div className="md:text-4xl text-white font-bold items-center">{user?.name} How Are You Feeling Today? </div>
           <div className="md:text-2xl text-white font-bold items-center"> Just take a moment to reflect on your day. Select the mood that resonates with you currently.</div>

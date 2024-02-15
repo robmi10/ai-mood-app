@@ -4,7 +4,6 @@ import { useContext } from "react";
 import { twMerge } from 'tailwind-merge'
 import MoodContext from "./context/MoodContext";
 
-
 export default function Mood() {
     const { selectedMood, setSelectedMood, setMoodScore } = useContext(MoodContext);
     const MOODS = [

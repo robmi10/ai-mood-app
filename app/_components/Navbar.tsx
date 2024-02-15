@@ -25,17 +25,17 @@ const Navbar = () => {
                 <div className='w-3/4'>
                     <div className='w-full flex justify-end'>
 
-                        {theme === 'dark' && <IoIosSunny onClick={() => setTheme('light')} size={50} color='white' className='cursor-pointer relative mt-4' />
+                        {theme === 'dark' && <IoIosSunny onClick={() => setTheme('light')} size={50} color='white' className='cursor-pointer relative mt-4 animate-fadeSmooth' />
                         }
-                        {(theme === 'light' || theme === 'system') && <MoonIcon onClick={() => setTheme('dark')} size={50} color='white' className='cursor-pointer relative mt-4' />
+                        {(theme === 'light' || theme === 'system') && <MoonIcon onClick={() => setTheme('dark')} size={50} color='white' className='cursor-pointer relative mt-4 animate-fadeSmooth' />
                         }
 
                         <div className='hidden md:flex items-center flex-col gap-4 w-24 mt-4'
                             onMouseEnter={() => setShowMenu(true)}
                             onMouseLeave={() => setShowMenu(false)}>
-                            <MdAccountCircle size={50} color='white' className='hover:cursor-pointer' />
+                            <MdAccountCircle size={50} color='white' className='hover:cursor-pointer animate-fadeSmooth' />
                             {showMenu && (
-                                <Button className="bg-black text-white w-24 rounded-xl shadow-lg" onClick={() => { signOut() }}>SIGNOUT</Button>
+                                <Button className="bg-black text-white w-24 rounded-xl shadow-lg animate-fadeSmooth" onClick={() => { signOut() }}>SIGNOUT</Button>
                             )}
                         </div>
                         <div className='flex md:hidden items-center flex-col gap-4 w-24 mt-4'

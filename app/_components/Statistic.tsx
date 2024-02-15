@@ -45,10 +45,10 @@ const Statistic = () => {
                 <div className='mb-12 z-'>
                     <Select defaultValue={timeFrameSelect[0].value.toString()} onValueChange={(value) => { setTimeFrame(Number(value)), setReflectionMood(false) }}>
                         <span className='text-white md:text-xl font-bold mb-2'> Choose Timeframe</span>
-                        <SelectTrigger className="w-[280px] bg-white rounded-xl border-none">
+                        <SelectTrigger className="w-[280px] bg-white rounded-xl border-none text-black">
                             <SelectValue placeholder={timeFrameSelect[0].label} />
                         </SelectTrigger>
-                        <SelectContent className='rounded-xl bg-white'>
+                        <SelectContent className='rounded-xl bg-white text-black'>
                             {timeFrameSelect.map((time, i) => (
                                 <SelectGroup>
                                     <SelectItem className='hover:cursor-pointer hover:bg-blue-500' key={i} value={time.value.toString()}>{time.label}</SelectItem>
@@ -63,7 +63,7 @@ const Statistic = () => {
                 {timeFrameMoodStatistic && <PieCharts data={timeFrameMoodStatistic} />}
             </div>
             <div className='mb-12 md:w-3/6 flex items-center mt-8'>
-                {!reflectionMood && <Button onClick={handleMoodReflection} className="bg-white p-2 h-auto rounded-xl shadow-lg hover:bg-slate-100 transition-colors ease-in-out duration-75">GET A MOOD SUMMARY FROM THE LAST {timeFrame === 1 ? 'WEEK' : 'MONTH'}</Button>}
+                {!reflectionMood && <Button onClick={handleMoodReflection} className="bg-white p-2 h-auto rounded-xl shadow-lg text-black hover:bg-slate-100 transition-colors ease-in-out duration-75">GET A MOOD SUMMARY FROM THE LAST {timeFrame === 1 ? 'WEEK' : 'MONTH'}</Button>}
                 {getMostCommonMoodCombo.isLoading && <h1 className='animate-pulse bg-white w-4 h-4 rounded-full' />}
                 {reflectionMood && aiRespone && <WordByWordRenderer delay={150} text={aiRespone} />}
             </div>

@@ -2,7 +2,6 @@
 import { api } from "@/lib/api";
 import { Button } from "@/lib/components/ui/button";
 import { useContext, useState } from "react";
-import { signOut } from 'next-auth/react';
 import { Input } from "@/lib/components/ui/input";
 import { BouncerLoader } from './animation/Bouncer'
 import Activites from "./Activites";
@@ -59,9 +58,9 @@ export default function asyncUserForm() {
         <Activites />
         <Weather />
         <Sleep />
-        <Input onChange={(e) => { setNotes(e.target.value) }} value={notes} className="w-full h-full p-4 bg-white rounded-xl shadow-lg border-none" type="text" placeholder="Explain more about your mood today" />
+        <Input onChange={(e) => { setNotes(e.target.value) }} value={notes} className="w-full h-full p-4 bg-white rounded-xl shadow-lg border-none text-black" type="text" placeholder="Explain more about your mood today" />
         <div className="space-x-2 bg-red w-full flex justify-end">
-          <Button className="bg-white w-24 rounded-xl shadow-lg" onClick={() => { handleSubmit() }}>SUBMIT</Button>
+          <Button className="bg-white w-24 rounded-xl shadow-lg text-black" onClick={() => { handleSubmit() }}>SUBMIT</Button>
         </div>
       </div>}
       {hasUserAnsweredToday && <Statistic />}

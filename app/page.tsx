@@ -16,7 +16,7 @@ export default async function Home() {
         <h1 className="text-xl md:text-2xl font-bold">Sign in to unlock insights into your mood and wellbeing</h1>
       </div>
 
-      <div className="flex md:w-2/4 justify-between border rounded-full  bg-white">
+      <div className="flex md:w-2/4 justify-between border rounded-full text-black bg-white">
         <Link className="text-2xl font-bold p-6 rounded-full transition-colors delay-100 ease-in-out" href="api/auth/signin"><FaGithub size={35} /></Link>
         <Link className="text-2xl font-bold p-6 rounded-full transition-colors delay-100 ease-in-out" href="api/auth/signin"><SiGmail size={35} /></Link>
         <Link className="text-2xl font-bold p-6 rounded-full transition-colors delay-100 ease-in-out" href="api/auth/signin"><FaFacebook size={35} /></Link>

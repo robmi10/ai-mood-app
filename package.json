@@ -26,6 +26,7 @@
     "lucide-react": "^0.303.0",
     "next": "14.0.4",
     "next-auth": "^4.24.5",
+    "next-themes": "^0.2.1",
     "node-pg-migrate": "^6.2.2",
     "openai": "^4.24.1",
     "pg": "^8.11.3",

@@ -11,6 +11,8 @@ interface MoodContextType {
     setSelectedMood: Dispatch<SetStateAction<string>>;
     moodScore: number;
     setMoodScore: Dispatch<SetStateAction<number>>;
+    account: any,
+    setAccount: Dispatch<SetStateAction<any>>;
 }
 
 const defaultValue: MoodContextType = {
@@ -24,6 +26,8 @@ const defaultValue: MoodContextType = {
     setSelectedMood: () => { },
     moodScore: 0,
     setMoodScore: () => { },
+    account: false,
+    setAccount: () => { }
 };
 
 const MoodContext = createContext(defaultValue);
@@ -38,12 +42,13 @@ export const MoodProvider = ({ children }: MoodProviderProps) => {
     const [selectedActivity, setSelectedActivity] = useState<string[]>([]);
     const [selectedMood, setSelectedMood] = useState<string>("");
     const [moodScore, setMoodScore] = useState<number>(0);
+    const [account, setAccount] = useState<any>(false);
 
     return (
         <MoodContext.Provider value={{
             selectedSleep, setSelectedSleep, selectedWeather,
             setSelectedWeather, selectedActivity, setSelectedActivity, selectedMood, setSelectedMood,
-            moodScore, setMoodScore
+            moodScore, setMoodScore, account, setAccount
         }}>
             {children}
         </MoodContext.Provider>

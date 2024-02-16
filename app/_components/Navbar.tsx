@@ -1,23 +1,23 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { MdAccountCircle } from "react-icons/md";
 import { signOut, useSession } from 'next-auth/react';
 import { Button } from '@/lib/components/ui/button';
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoCloseOutline } from "react-icons/io5";
 import { IoIosSunny } from "react-icons/io";
-import { IoMdMoon } from "react-icons/io";
 import { useTheme } from 'next-themes';
 import { MoonIcon } from 'lucide-react';
+import MoodContext from './context/MoodContext';
 
 
 const Navbar = () => {
     const { data: session } = useSession()
     const { theme, setTheme } = useTheme()
-
-    console.log("check theme ->", theme)
+    const { setAccount } = useContext(MoodContext);
     const [showMenu, setShowMenu] = useState(false);
     if (!session) return false;
+    setAccount(session)
 
     return (
         <>

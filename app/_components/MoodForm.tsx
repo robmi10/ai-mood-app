@@ -11,16 +11,17 @@ import MoodContext from "./context/MoodContext";
 import Statistic from "./Statistic";
 import Mood from "./Mood";
 
+
 export default function asyncUserForm() {
   const [notes, setNotes] = useState("");
   const { selectedSleep, setSelectedSleep, selectedWeather,
-    setSelectedWeather, selectedActivity, setSelectedActivity, setSelectedMood, moodScore } = useContext(MoodContext);
+    setSelectedWeather, selectedActivity, setSelectedActivity, setSelectedMood, moodScore, account } = useContext(MoodContext);
+  const user = account?.user ?? false;
   const getUsers = api.users.getUsers.useQuery();
-  const user = getUsers?.data?.users[0]
-  const todayAnswer = api.mood.getUserHasAlreadyAnsweredToday.useQuery({ userId: user?.id })
-  const hasUserAnsweredToday = todayAnswer.isSuccess && todayAnswer?.data?.hasUserAlreadyAnsweredForToday
+  const _userId = getUsers?.data?.users.filter((option: any) => option.email === user?.email)[0].id
 
-  console.log("hasUserAnsweredToday ->", hasUserAnsweredToday)
+  const todayAnswer = api.mood.getUserHasAlreadyAnsweredToday.useQuery({ userId: _userId })
+  const hasUserAnsweredToday = todayAnswer.isSuccess && todayAnswer?.data?.hasUserAlreadyAnsweredForToday
 
   const createDailyMood = api.mood.createMood.useMutation({
     onSettled() {
@@ -33,10 +34,9 @@ export default function asyncUserForm() {
     }
   })
 
-
   const handleSubmit = () => {
     createDailyMood.mutate({
-      userId: user?.id || 2, moodScore: moodScore,
+      userId: _userId ?? 0, moodScore: moodScore,
       notes: notes, activities: selectedActivity, sleepQuality: selectedSleep, weather: selectedWeather
     }, {
       onSuccess() {
@@ -44,8 +44,7 @@ export default function asyncUserForm() {
       }
     })
   }
-
-  if (todayAnswer.isLoading || createDailyMood.isPending) { return <div className='h-screen flex justify-center items-center'><BouncerLoader /></div> }
+  if (!user || createDailyMood.isPending || todayAnswer.isPending) return <div className='h-screen flex justify-center items-center'><BouncerLoader /></div>
 
   return (
     <>

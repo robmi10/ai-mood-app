@@ -2,8 +2,7 @@
 import { api } from '@/lib/api'
 import AreaCharts from '@/lib/components/ui/barcharts'
 import PieCharts from '@/lib/components/ui/piechart'
-import React, { useState } from 'react'
-import { signOut } from 'next-auth/react';
+import React, { useContext, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -14,22 +13,26 @@ import {
 import { Button } from '@/lib/components/ui/button'
 import { WordByWordRenderer } from './animation/WordAnimation'
 import { SelectGroup } from '@radix-ui/react-select'
+import MoodContext from './context/MoodContext'
 
 const Statistic = () => {
     const [timeFrame, setTimeFrame] = useState(1)
     const [reflectionMood, setReflectionMood] = useState(false);
-
-    const getTimeStats = api.mood.getMoodStatisticTime.useQuery({ timeFrame }, {
+    const { account } = useContext(MoodContext);
+    const getUsers = api.users.getUsers.useQuery();
+    const user = account?.user ?? false;
+    const _userId = getUsers?.data?.users.filter((option: any) => option.email === user?.email)[0].id
+    const getTimeStats = api.mood.getMoodStatisticTime.useQuery({ timeFrame: timeFrame, userId: _userId }, {
         enabled: !!timeFrame
     });
-    const getUsers = api.users.getUsers.useQuery();
-    const user = getUsers?.data?.users[0]
-    const getMostCommonMoodCombo = api.mood.getDailyMoodReflectionAndMotivation.useQuery({ userId: user?.id, timeFrame }, {
+
+    const getMostCommonMoodCombo = api.mood.getDailyMoodReflectionAndMotivation.useQuery({ userId: _userId, timeFrame }, {
         enabled: !!reflectionMood,
     })
     const aiRespone = getMostCommonMoodCombo?.data?.content
     const timeFrameMoodStatistic = getTimeStats?.data?.statistics
     const timeFrameSelect = [{ value: 1, label: "Weekly" }, { value: 2, label: "Monthly" }]
+    const hasStatistic = timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods.length > 0
 
     const handleMoodReflection = () => {
         setReflectionMood(true)
@@ -58,15 +61,17 @@ const Statistic = () => {
                     </Select>
                 </div>
             </div>
-            <div className='md:w-7/12 w-[350px] flex flex-col md:flex-row items-center animate-fadeIn'>
+            {hasStatistic && <div className='md:w-7/12 w-[350px] flex flex-col md:flex-row items-center animate-fadeIn'>
                 {timeFrameMoodStatistic && <AreaCharts data={timeFrameMoodStatistic} />}
                 {timeFrameMoodStatistic && <PieCharts data={timeFrameMoodStatistic} />}
-            </div>
-            <div className='mb-12 md:w-3/6 flex items-center mt-8 animate-fadeIn'>
+            </div>}
+            {hasStatistic && <div className='mb-12 md:w-3/6 flex items-center mt-8 animate-fadeIn'>
                 {!reflectionMood && <Button onClick={handleMoodReflection} className="bg-white p-2 h-auto rounded-xl shadow-lg text-black hover:bg-slate-100 transition-colors ease-in-out duration-75">GET A MOOD SUMMARY FROM THE LAST {timeFrame === 1 ? 'WEEK' : 'MONTH'}</Button>}
                 {getMostCommonMoodCombo.isLoading && <h1 className='animate-pulse bg-white w-4 h-4 rounded-full' />}
                 {reflectionMood && aiRespone && <WordByWordRenderer delay={150} text={aiRespone} />}
-            </div>
+            </div>}
+
+            {!hasStatistic && <p>Not enough data for current timeframe..</p>}
         </div>
     )
 }

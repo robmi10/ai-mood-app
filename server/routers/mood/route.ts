@@ -163,8 +163,9 @@ export const moodRouter = createTRPCRouter({
             console.log("message ->", message)
             return message;
         }),
-    getMoodStatisticTime: protectedProcedure.input(z.object({ timeFrame: z.number() })).query(async (opts) => {
-        let userId = 1;
+    getMoodStatisticTime: protectedProcedure.input(z.object({ timeFrame: z.number(), userId: z.number() })).query(async (opts) => {
+        let userId = opts.input.userId;
+        console.log("userId check backend ->", userId)
         const timeFrameList = ["WEEKLY", "MONTHLY"]
         const currentFrame = timeFrameList[opts.input.timeFrame - 1]
         const moodTallies: any = {
@@ -257,6 +258,8 @@ export const moodRouter = createTRPCRouter({
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
+        console.log("check userId now ->", opts.input.userId)
 
         const todaysMood =
             await db.selectFrom("moods")

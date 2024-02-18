@@ -8,6 +8,11 @@ import { formatPointToMood } from "@/lib/utils/formatMood";
 import { formatDateWithDay, getMonthName } from "@/lib/utils/formatDate";
 import { getStartAndEndDate, getTimeMonthlyFrameDate, getTimeWeeklyFrameDate } from "@/lib/utils/getLatestDate";
 
+interface Combination {
+    count: number;
+    data: any;
+}
+
 export const moodRouter = createTRPCRouter({
     createMood: protectedProcedure
         .input(
@@ -117,7 +122,7 @@ export const moodRouter = createTRPCRouter({
             let mostFrequentEntry: any = {};
             let maxCount = 0;
 
-            Object.values(combinationCounts).forEach(combination => {
+            (Object.values(combinationCounts) as Combination[]).forEach(combination => {
                 if (combination.count > maxCount) {
                     maxCount = combination.count;
                     mostFrequentEntry = combination.data;
@@ -135,7 +140,7 @@ export const moodRouter = createTRPCRouter({
 
             console.log("pineconeIds ->", pineconeIds)
 
-            const matchedMoods = allMoodsFromUser.filter(mood => pineconeIds.includes(mood?.id.toString()));
+            const matchedMoods = allMoodsFromUser.filter(mood => mood.id && pineconeIds.includes(mood?.id.toString()));
 
             console.log("matchedMoods pinecone ->", matchedMoods)
             let prompt = `As a mood analyzer, provide a concise summary of key mood patterns for a ${timeFrame} time frame. 
@@ -143,7 +148,7 @@ export const moodRouter = createTRPCRouter({
             ike ${mostFrequentEntry.activities}, ${mostFrequentEntry.weather} weather, 
             and '${mostFrequentEntry.sleepQuality}' sleep. Recent mood entries:\n`;
             matchedMoods.forEach(entry => {
-                prompt += `Weekday: ${formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
+                prompt += `Weekday: ${entry?.createdAt && formatDateWithDay(entry?.createdAt.toString())}, Mood: ${formatPointToMood(entry.moodScore)}, Activities: ${entry.activities && entry.activities.join(', ')}, Weather: ${entry.weather}, Sleep Quality: ${entry.sleepQuality}.\n`;
             });
             prompt += "Identify key trends and insights from these mood entries in a brief summary.";
             const systemMessage: ChatCompletionSystemMessageParam = {
@@ -178,7 +183,7 @@ export const moodRouter = createTRPCRouter({
         let statistics = [];
         let averageMoods;
 
-        const { start, end } = getTimeWeeklyFrameDate(currentFrame)
+        const { start, end } = getTimeWeeklyFrameDate()
         if (currentFrame === 'WEEKLY') {
             const allMoodsWeekly = await db
                 .selectFrom('moods')
@@ -205,7 +210,7 @@ export const moodRouter = createTRPCRouter({
             const moods = allMoodsWeekly.map((mood) => {
                 return {
                     ...mood,
-                    createdAt: formatDateWithDay(mood.createdAt?.toString()),
+                    createdAt: formatDateWithDay(mood.createdAt?.toString() ?? ""),
                 }
             })
             statistics.push({
@@ -214,7 +219,7 @@ export const moodRouter = createTRPCRouter({
             })
         }
         else if (currentFrame === 'MONTHLY') {
-            const monthlyTimeFrames = getTimeMonthlyFrameDate(currentFrame)
+            const monthlyTimeFrames = getTimeMonthlyFrameDate()
             const moods = []
             for (const frame of monthlyTimeFrames) {
                 const allMoodsMonthly = await db

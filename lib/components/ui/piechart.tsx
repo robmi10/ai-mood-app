@@ -11,7 +11,7 @@ export default function PieCharts({ data }: Props) {
         value: mood.average
     }));
 
-    const onPieEnter = (_, index) => {
+    const onPieEnter = (_: any, index: any) => {
         setActiveIndex(index);
     };
 
@@ -30,7 +30,7 @@ export default function PieCharts({ data }: Props) {
                         onMouseEnter={onPieEnter}
                         onMouseLeave={onPieLeave}
                     >
-                        {piedata.map((entry, index) => (
+                        {piedata.map((entry: any, index: any) => (
                             <Cell
                                 key={`cell-${index}`}
                                 fill={index === activeIndex ? "#8884d8" : "#aaa6f7"}

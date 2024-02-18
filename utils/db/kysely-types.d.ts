@@ -7,7 +7,7 @@ export interface Users {
 
 export interface Moods {
   id?: number;
-  userId: number;
+  userId?: number;
   moodScore: number;
   notes?: string;
   createdAt?: Date;

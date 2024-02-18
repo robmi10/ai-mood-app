@@ -18,7 +18,7 @@ export default function asyncUserForm() {
     setSelectedWeather, selectedActivity, setSelectedActivity, setSelectedMood, moodScore, account } = useContext(MoodContext);
   const user = account?.user ?? false;
   const getUsers = api.users.getUsers.useQuery();
-  const _userId = getUsers?.data?.users.filter((option: any) => option.email === user?.email)[0].id
+  const _userId = getUsers?.data?.users.filter((option: any) => option.email === user?.email)[0].id ?? 0
 
   const todayAnswer = api.mood.getUserHasAlreadyAnsweredToday.useQuery({ userId: _userId })
   const hasUserAnsweredToday = todayAnswer.isSuccess && todayAnswer?.data?.hasUserAlreadyAnsweredForToday

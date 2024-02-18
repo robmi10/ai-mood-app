@@ -21,7 +21,7 @@ const Statistic = () => {
     const { account } = useContext(MoodContext);
     const getUsers = api.users.getUsers.useQuery();
     const user = account?.user ?? false;
-    const _userId = getUsers?.data?.users.filter((option: any) => option.email === user?.email)[0].id
+    const _userId = getUsers?.data?.users.filter((option: any) => option.email === user?.email)[0].id ?? 0
     const getTimeStats = api.mood.getMoodStatisticTime.useQuery({ timeFrame: timeFrame, userId: _userId }, {
         enabled: !!timeFrame
     });

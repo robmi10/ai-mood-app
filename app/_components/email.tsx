@@ -1,14 +1,14 @@
 
-import { api } from '@/lib/api';
 import React from 'react'
+type EmailTemplateProps = {
+    name: string;
+};
 
-const EmailTemplate = () => {
-    const getUsers = api.users.getUsers.useQuery();
-    const user = getUsers?.data?.users[0]
-    if (!user) return false
+const EmailTemplate: React.FC<EmailTemplateProps> = ({ name }) => {
+    console.log("inside email template check current name ->", name)
     return (
         <div style={{ fontFamily: 'Arial, sans-serif', color: '#333' }}>
-            <h1 style={{ color: '#4A90E2' }}>Hello {user.name},</h1>
+            <h1 style={{ color: '#4A90E2' }}>Hello {name},</h1>
             <p>Hope you're having a great day!</p>
             <p>We believe that keeping track of your daily mood can bring valuable insights into your life. It helps in understanding your emotional patterns and triggers, which is a step towards better mental health and wellbeing.</p>
             <p>We noticed you haven't logged today's mood yet. It only takes a minute, and the insights you'll gain are invaluable. Let's do it now!</p>

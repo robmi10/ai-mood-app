@@ -8,7 +8,7 @@ type Props = {
 export const WordByWordRenderer = ({ text, delay }: Props) => {
     const [displayedWords, setDisplayedWords] = useState<string[]>([]);
     const words = text.split(' ');
-    const endOfTextRef = useRef(null);
+    const endOfTextRef = useRef<any>(null);
 
     const scrollToBottom = () => {
         endOfTextRef.current?.scrollIntoView({ behavior: "smooth" });

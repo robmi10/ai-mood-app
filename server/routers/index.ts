@@ -7,5 +7,4 @@ export const appRouter = createTRPCRouter({
   mood: moodRouter,
 });
 
-// export type definition of API
 export type AppRouter = typeof appRouter;

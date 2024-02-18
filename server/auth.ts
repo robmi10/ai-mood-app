@@ -3,7 +3,7 @@ import { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   providers: [
     GitHubProvider({
       clientId: process.env.NEXT_PUBLIC_GITHUB_ID ?? "",
@@ -36,3 +36,4 @@ export const authOptions: NextAuthOptions = {
 
 };
 
+export default authOptions

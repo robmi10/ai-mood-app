@@ -2,6 +2,7 @@ import NextAuth from "next-auth/next";
 import { NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import { db } from "@/utils/db/db";
 
 const authOptions: NextAuthOptions = {
     providers: [

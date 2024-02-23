@@ -3,7 +3,7 @@ import { Pool } from "pg";
 import { DB } from "./kysely-types";
 
 const pool = new Pool({
-  connectionString: process.env.NEXT_PUBLIC_DATABASE_URL,
+  connectionString: process.env.DATABASE_URL,
 });
 
 export const db = new Kysely<DB>({

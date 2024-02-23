@@ -1,11 +1,19 @@
 export const getTimeWeeklyFrameDate = () => {
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     const dayOfWeek = now.getDay();
-    const lastSunday = new Date(now.setDate(now.getDate() - dayOfWeek));
-    const lastMonday = new Date(now.setDate(lastSunday.getDate() - 7));
-    return { start: lastMonday, end: lastSunday };
+    const diffToLastSunday = dayOfWeek === 0 ? 7 : dayOfWeek;
 
+    const lastSunday = new Date(now.setDate(now.getDate() - diffToLastSunday));
+
+    const lastMonday = new Date(lastSunday);
+    lastMonday.setDate(lastSunday.getDate() - 6);
+
+    lastSunday.setHours(23, 59, 59, 999);
+
+    return { start: lastMonday, end: lastSunday };
 };
+
 
 export const getTimeMonthlyFrameDate = () => {
     const now = new Date();
@@ -15,7 +23,6 @@ export const getTimeMonthlyFrameDate = () => {
         const lastDay = new Date(now.getFullYear(), month + 1, 0);
         months.push({ start: firstDay, end: lastDay });
     }
-    console.log("months ..>", months)
     return months;
 };
 

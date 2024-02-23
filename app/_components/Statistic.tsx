@@ -32,7 +32,8 @@ const Statistic = () => {
     const aiRespone = getMostCommonMoodCombo?.data?.content
     const timeFrameMoodStatistic = getTimeStats?.data?.statistics
     const timeFrameSelect = [{ value: 1, label: "Weekly" }, { value: 2, label: "Monthly" }]
-    const hasStatistic = timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods.length > 0
+    const weekHasStatistic = timeFrame === 1 && timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods.length > 6
+    const monthHasStatistic = timeFrame === 2 && timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods?.moodScore
 
     const handleMoodReflection = () => {
         setReflectionMood(true)
@@ -61,17 +62,17 @@ const Statistic = () => {
                     </Select>
                 </div>
             </div>
-            {hasStatistic && <div className='md:w-7/12 w-[350px] flex flex-col md:flex-row items-center animate-fadeIn'>
+            {(weekHasStatistic || monthHasStatistic) && <div className='md:w-7/12 w-[350px] flex flex-col md:flex-row items-center animate-fadeIn'>
                 {timeFrameMoodStatistic && <AreaCharts data={timeFrameMoodStatistic} />}
                 {timeFrameMoodStatistic && <PieCharts data={timeFrameMoodStatistic} />}
             </div>}
-            {hasStatistic && <div className='mb-12 md:w-3/6 flex items-center mt-8 animate-fadeIn'>
+            {(weekHasStatistic || monthHasStatistic) && <div className='mb-12 md:w-3/6 flex items-center mt-8 animate-fadeIn'>
                 {!reflectionMood && <Button onClick={handleMoodReflection} className="bg-white p-2 h-auto rounded-xl shadow-lg text-black hover:bg-slate-100 transition-colors ease-in-out duration-75">GET A MOOD SUMMARY FROM THE LAST {timeFrame === 1 ? 'WEEK' : 'MONTH'}</Button>}
                 {getMostCommonMoodCombo.isLoading && <h1 className='animate-pulse bg-white w-4 h-4 rounded-full' />}
                 {reflectionMood && aiRespone && <WordByWordRenderer delay={150} text={aiRespone} />}
             </div>}
 
-            {!hasStatistic && <p>Not enough data for current timeframe..</p>}
+            {!(weekHasStatistic || monthHasStatistic) && <p className='text-white text-xl'>Not enough data for current timeframe..</p>}
         </div>
     )
 }

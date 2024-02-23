@@ -5,8 +5,8 @@ import { XAxis, YAxis, ResponsiveContainer, AreaChart, CartesianGrid, Tooltip, A
 
 type MoodData = {
     name: string;
-    value: number; // Keep as number for chart plotting
-    moodString?: string; // Optional: for tooltip display
+    value: number;
+    moodString?: string;
 };
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
 
 const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
     if (active && payload && payload.length) {
-        const mood = formatPointToMood(payload[0].value as number);
+        const mood = formatPointToMood(Math.round(payload[0].value as number));
         return (
             <div className="custom-tooltip">
                 <p className="label">{`${mood}`}</p>
@@ -29,7 +29,6 @@ const CustomTooltip = ({ active, payload }: TooltipProps<number, string>) => {
 export default function AreaCharts({ data }: Props) {
     const { theme } = useTheme()
     const isDark = theme === 'dark'
-    const isLight = theme === 'light' || theme === 'system'
     const areadata: MoodData[] = data[0].moods.map((mood: any) => {
         return {
             name: mood.createdAt.substr(0, 3),

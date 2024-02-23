@@ -139,13 +139,11 @@ export const moodRouter = createTRPCRouter({
                 role: "system",
                 content: prompt
             }
-
             const response = await openai.chat.completions.create({
                 model: "gpt-3.5-turbo",
                 stream: false,
                 messages: [systemMessage]
             })
-
             const message = response.choices[0].message
             return message;
         }),

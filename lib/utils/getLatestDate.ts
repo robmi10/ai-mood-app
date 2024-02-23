@@ -17,14 +17,14 @@ export const getTimeWeeklyFrameDate = () => {
 
 export const getTimeMonthlyFrameDate = () => {
     const now = new Date();
-    let months = [];
-    for (let month = 0; month < now.getMonth() + 1; month++) {
-        const firstDay = new Date(now.getFullYear(), month, 1);
-        const lastDay = new Date(now.getFullYear(), month + 1, 0);
-        months.push({ start: firstDay, end: lastDay });
-    }
-    return months;
+    const firstDayOfCurrentMonth: any = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfPreviousMonth = new Date(firstDayOfCurrentMonth - 1); // This automatically adjusts to the last day of the previous month
+
+    const startOfPreviousMonth = new Date(endOfPreviousMonth.getFullYear(), endOfPreviousMonth.getMonth(), 1);
+
+    return [{ start: startOfPreviousMonth, end: endOfPreviousMonth }];
 };
+
 
 export const getStartAndEndDate = (period: string) => {
     const now = new Date();

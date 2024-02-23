@@ -33,7 +33,7 @@ const Statistic = () => {
     const timeFrameMoodStatistic = getTimeStats?.data?.statistics
     const timeFrameSelect = [{ value: 1, label: "Weekly" }, { value: 2, label: "Monthly" }]
     const weekHasStatistic = timeFrame === 1 && timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods.length > 6
-    const monthHasStatistic = timeFrame === 2 && timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods?.moodScore
+    const monthHasStatistic = timeFrame === 2 && timeFrameMoodStatistic && timeFrameMoodStatistic[0]?.moods[0].moodScore
 
     const handleMoodReflection = () => {
         setReflectionMood(true)

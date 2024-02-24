@@ -10,7 +10,7 @@ export default function Provider({ children }: { children: React.ReactNode }) {
     api.createClient({
       links: [
         httpBatchLink({
-          url: process.env.TRPC_API_URL ?? "",
+          url: "https://ai-mood-app.vercel.app/api/trpc",
         }),
       ],
     })

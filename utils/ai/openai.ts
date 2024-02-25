@@ -11,7 +11,6 @@ const openai = new OpenAI({ apiKey });
 export default openai;
 
 export async function getEmbedding(moodEntry: any) {
-    console.log("inside getEmbedding", moodEntry)
     const text = `Mood Score: ${moodEntry.moodScore}. ` +
         `Notes: ${moodEntry?.notes}. ` +
         `Activities: ${moodEntry.activities.join(', ')}. ` +

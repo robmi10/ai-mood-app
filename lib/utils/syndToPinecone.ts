@@ -21,7 +21,6 @@ async function vectorizeAndSyncToPinecone() {
             date: new Date()
         }
 
-        console.log("moodEntry ->", moodEntry)
         const vector = await getEmbedding(moodEntry);
 
         await pineconeIndex.upsert([

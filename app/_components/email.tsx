@@ -5,7 +5,6 @@ type EmailTemplateProps = {
 };
 
 const EmailTemplate: React.FC<EmailTemplateProps> = ({ name }) => {
-    console.log("inside email template check current name ->", name)
     return (
         <div style={{ fontFamily: 'Arial, sans-serif', color: '#333' }}>
             <h1 style={{ color: '#4A90E2' }}>Hello {name},</h1>

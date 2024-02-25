@@ -19,13 +19,10 @@ const authOptions: NextAuthOptions = {
     secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
         async signIn(credentials: any) {
-            console.log({ credentials })
             const user = credentials.user.name
             const email = credentials.user.email
             const res = await db
                 .selectFrom("users").where('name', '=', user).execute()
-
-            console.log("res ->", res)
             if (res.length === 0) {
                 await db
                     .insertInto("users")

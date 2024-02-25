@@ -21,7 +21,6 @@ export async function POST() {
     const users = await fetchUserData();
 
     if (!users) return new Response(JSON.stringify({ error: 'User not found' }), { status: 404 });
-    console.log("check all users list ->", users)
     const emailPromises = users.map(user => {
         return resend.emails.send({
             from: 'Acme <onboarding@resend.dev>',

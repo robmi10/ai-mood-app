@@ -13,11 +13,13 @@
     "@pinecone-database/pinecone": "^1.1.2",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-toast": "^1.1.5",
     "@react-icons/all-files": "^4.1.0",
     "@tanstack/react-query": "^5.17.0",
     "@trpc/next": "^11.0.0-next-alpha.149",
     "@trpc/server": "^11.0.0-next-alpha.149",
     "ai": "^2.2.31",
+    "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "crypto-js": "^4.2.0",
@@ -43,6 +45,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/pg": "^8.10.9",

@@ -3,6 +3,7 @@ export interface Users {
   name: string;
   email: string;
   createdAt?: Date;
+  password?: password
 }
 
 export interface Moods {

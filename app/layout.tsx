@@ -4,6 +4,7 @@ import NextAuthProvider from "./_components/SessionProvider"
 import { MoodProvider } from "./_components/context/MoodContext";
 import Navbar from "./_components/Navbar";
 import { ThemeProviders } from "./_components/providers";
+import { Toaster } from "@/components/ui/toaster"
 
 export default function RootLayout({
   children,
@@ -20,6 +21,7 @@ export default function RootLayout({
               <MoodProvider>
                 <Navbar />
                 {children}
+                <Toaster />
               </MoodProvider>
             </Provider>
           </ThemeProviders>

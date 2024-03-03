@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import UserForm from "./_components/MoodForm";
-import { GithubSignInButton, GoogleSignInButton } from "./_components/authButtons";
-
+import { EmailSignInButton, GithubSignInButton, GoogleSignInButton } from "./_components/authButtons";
 
 export default async function Home() {
   const session = await getServerSession();
@@ -13,10 +12,13 @@ export default async function Home() {
         <h1 className="text-2xl md:text-5xl font-bold">Embrace Your Feelings, Transform Your Days</h1>
         <h1 className="text-xl md:text-2xl font-bold">Sign in to unlock insights into your mood and wellbeing</h1>
       </div>
+      <div className="flex md:w-4/5 justify-around flex-col h-auto border p-8 rounded-xl space-y-4 text-black bg-white">
 
-      <div className="flex md:w-2/5 justify-around border h-20 rounded-full text-black bg-white">
-        <GoogleSignInButton />
-        <GithubSignInButton />
+        <div className="w-full justify-center">
+          <EmailSignInButton />
+          <GoogleSignInButton />
+          <GithubSignInButton />
+        </div>
       </div>
     </div>
   </div >;

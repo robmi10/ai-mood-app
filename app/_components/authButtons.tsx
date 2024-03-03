@@ -93,7 +93,7 @@ export function EmailSignInButton() {
                 body: JSON.stringify({ name, email, password, confirmPassword }),
             });
 
-            const data = await res.json(); // Parsing the JSON body of the response
+            const data = await res.json();
 
             if (res.ok) {
                 toast({
@@ -101,18 +101,17 @@ export function EmailSignInButton() {
                     title: "Registration Success",
                     description: "User is registered.",
                 });
-                // Reset form fields and possibly redirect or change state
+
                 setName('');
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');
-                setFormState(false); // Assuming you have a state to toggle form visibility
+                setFormState(false);
             } else {
-                // Use the error message from the response body
                 toast({
                     variant: 'destructive',
                     title: "Registration Failed",
-                    description: data.message, // Displaying the error message from the server
+                    description: data.message,
                     action: <ToastAction altText="Try again">Try again</ToastAction>,
                 });
             }
@@ -131,7 +130,7 @@ export function EmailSignInButton() {
     return (
         <>
             {!formState ? (
-                <form onSubmit={handleLogin} className="space-y-3">
+                <form onSubmit={handleLogin} className="space-y-3 animate-fadeSmooth">
                     <p>LOGIN</p>
                     <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="rounded-lg" placeholder="Email" />
                     <Input name="password" value={password} onChange={(e) => { setPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Password" />
@@ -145,7 +144,7 @@ export function EmailSignInButton() {
                     <Button type="submit" className="border w-full">Submit</Button>
                 </form>
             ) : (
-                <form onSubmit={handleRegister} className="space-y-3">
+                <form onSubmit={handleRegister} className="space-y-3 animate-fadeSmooth">
                     <p>REGISTER</p>
                     <Input name="name" onChange={(e) => { setName(e.target.value) }} value={name} className="rounded-lg" placeholder="Name" />
                     <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="rounded-lg" placeholder="Email" />

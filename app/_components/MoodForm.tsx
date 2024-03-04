@@ -44,7 +44,7 @@ export default function asyncUserForm() {
       }
     })
   }
-  if (!user || createDailyMood.isPending || todayAnswer.isPending) return <div className='h-screen flex justify-center items-center'><BouncerLoader /></div>
+  if (!user || createDailyMood.isPending || todayAnswer.isPending) return <div className='h-screen flex justify-center items-center'><BouncerLoader dark={false} /></div>
 
   return (
     <>

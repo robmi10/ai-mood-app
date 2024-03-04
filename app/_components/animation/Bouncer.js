@@ -1,5 +1,10 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
+const colors = {
+  light: ['#e6f5fa', '#f2f8fa', '#fcfcfc'],
+  dark: ['#b3d4e0', '#c6dee8', '#dae7f0'],
+};
+
 export const BouncerLoaderWrapper = styled.div`
   display: flex;
   justify-content: space-around;
@@ -16,10 +21,7 @@ const bounceranimation = keyframes`
 export const BouncerDiv = styled.div`
   width: 10px;
   height: 10px;
-  background-color: #e6f5fa;
-  background-color: #f2f8fa;
-  background-color: #fcfcfc;
-
+  background-color: ${({ dark, index }) => dark ? colors.dark[index] : colors.light[index]};
   border-radius: 50%;
   animation: ${bounceranimation} 0.5s cubic-bezier(0.19, 0.57, 0.3, 0.98)
     infinite alternate;
@@ -38,13 +40,12 @@ export const BouncerDiv = styled.div`
   }
 `;
 
-export const BouncerLoader = () => {
+export const BouncerLoader = ({ dark }) => {
   return (
     <BouncerLoaderWrapper>
-      <BouncerDiv />
-      <BouncerDiv />
-      <BouncerDiv />
-      <BouncerDiv />
+      {[...Array(4).keys()].map(index => (
+        <BouncerDiv key={index} index={index} dark={dark} />
+      ))}
     </BouncerLoaderWrapper>
   );
 };

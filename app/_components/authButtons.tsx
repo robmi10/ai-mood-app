@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from 'next/navigation';
+import { BouncerLoader } from "./animation/Bouncer";
 
 export function GoogleSignInButton() {
     const handleClick = () => {
@@ -38,9 +39,12 @@ export function EmailSignInButton() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const handleLogin = async (event: any) => {
         event.preventDefault();
+        setIsLoading(true);
         const email = event.target.email.value;
         const password = event.target.password.value;
 
@@ -56,23 +60,36 @@ export function EmailSignInButton() {
                 title: "Login Failed",
                 description: "Invalid login credentials. Please try again.",
             });
+            setName('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+            setIsLoading(false);
         } else {
             toast({
                 variant: 'success',
                 title: "Logged In",
                 description: "You are now logged in.",
             });
+            setIsLoading(false);
             router.push('/');
             router.refresh();
         }
     };
 
-    const handleRegister = async (event) => {
+    const handleRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const name = event.target.name.value;
-        const email = event.target.email.value;
-        const password = event.target.password.value;
-        const confirmPassword = event.target.confirmPassword.value;
+        setIsLoading(true);
+        const target = event.target as typeof event.target & {
+            name: { value: string };
+            email: { value: string };
+            password: { value: string };
+            confirmPassword: { value: string };
+        };
+        const name = target.name.value;
+        const email = target.email.value;
+        const password = target.password.value;
+        const confirmPassword = target.confirmPassword.value;
 
         if (confirmPassword !== password) {
             toast({
@@ -81,6 +98,11 @@ export function EmailSignInButton() {
                 description: "Passwords don't match.",
                 action: <ToastAction altText="Try again">Try again</ToastAction>,
             });
+            setName('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+            setIsLoading(false);
             return
         }
 
@@ -107,6 +129,7 @@ export function EmailSignInButton() {
                 setPassword('');
                 setConfirmPassword('');
                 setFormState(false);
+                setIsLoading(false);
             } else {
                 toast({
                     variant: 'destructive',
@@ -114,6 +137,7 @@ export function EmailSignInButton() {
                     description: data.message,
                     action: <ToastAction altText="Try again">Try again</ToastAction>,
                 });
+                setIsLoading(false);
             }
         } catch (error) {
             console.error(error);
@@ -141,7 +165,7 @@ export function EmailSignInButton() {
                         setPassword('');
                         setConfirmPassword('');
                     }}>Don't have an account to login with, register here?</p>
-                    <Button type="submit" className="border w-full">Submit</Button>
+                    <Button type="submit" className="border w-full p-5">{!isLoading ? <p>Submit</p> : <BouncerLoader dark={true} />}</Button>
                 </form>
             ) : (
                 <form onSubmit={handleRegister} className="space-y-3 animate-fadeSmooth">
@@ -157,7 +181,7 @@ export function EmailSignInButton() {
                         setPassword('');
                         setConfirmPassword('');
                     }}>Have an account to login with?</p>
-                    <Button type="submit" className="border w-full">Submit</Button>
+                    <Button type="submit" className="border w-full p-5">{!isLoading ? <p>Submit</p> : <BouncerLoader dark={true} />}</Button>
                 </form>
             )}
         </>

@@ -173,7 +173,7 @@ export function EmailSignInButton() {
                     <Input name="name" onChange={(e) => { setName(e.target.value) }} value={name} className="rounded-lg" placeholder="Name" />
                     <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="rounded-lg" placeholder="Email" />
                     <Input name="password" value={password} onChange={(e) => { setPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Create a new password" />
-                    <Input name="confirmPassword" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Enter your Password" />
+                    <Input name="confirmPassword" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Enter your password" />
                     <p className="text-xs cursor-pointer hover:text-red-500 transition-colors duration-75 ease-in-out" onClick={() => {
                         setFormState(false);
                         setName('');

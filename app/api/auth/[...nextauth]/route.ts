@@ -25,7 +25,7 @@ const authOptions: NextAuthOptions = {
             async authorize(credentials) {
                 const { email, password } = credentials || {};
                 if (!email || !password) {
-                    return null; // Ensure you return null if credentials are missing
+                    return null;
                 }
                 const getUser = await db
                     .selectFrom("users").selectAll().where('email', '=', email)

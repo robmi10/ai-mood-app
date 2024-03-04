@@ -23,8 +23,10 @@ const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                const { email, password } = credentials;
-
+                const { email, password } = credentials || {};
+                if (!email || !password) {
+                    return null; // Ensure you return null if credentials are missing
+                }
                 const getUser = await db
                     .selectFrom("users").selectAll().where('email', '=', email)
                     .execute();
@@ -38,7 +40,7 @@ const authOptions: NextAuthOptions = {
                 if (!passwordMatch) {
                     throw new Error('Incorrect password');
                 }
-                return { id: user.id, name: user.name, email: user.email };
+                return { id: String(user.id), name: user.name, email: user.email };
             }
         }),
 

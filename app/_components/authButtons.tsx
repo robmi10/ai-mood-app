@@ -156,8 +156,9 @@ export function EmailSignInButton() {
             {!formState ? (
                 <form onSubmit={handleLogin} className="space-y-3 animate-fadeSmooth">
                     <p>LOGIN</p>
-                    <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="rounded-lg" placeholder="Email" />
-                    <Input name="password" value={password} onChange={(e) => { setPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Password" />
+                    <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="w-full rounded-xl shadow-lg border text-sm placeholder-slate-400"
+                        placeholder="Email" />
+                    <Input name="password" value={password} onChange={(e) => { setPassword(e.target.value) }} type="password" className="w-full rounded-xl shadow-lg border text-sm placeholder-gray-400" placeholder="Password" />
                     <p className="text-xs cursor-pointer hover:text-red-500 transition-colors duration-75 ease-in-out" onClick={() => {
                         setFormState(true);
                         setName('');
@@ -170,10 +171,10 @@ export function EmailSignInButton() {
             ) : (
                 <form onSubmit={handleRegister} className="space-y-3 animate-fadeSmooth">
                     <p>REGISTER</p>
-                    <Input name="name" onChange={(e) => { setName(e.target.value) }} value={name} className="rounded-lg" placeholder="Name" />
-                    <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="rounded-lg" placeholder="Email" />
-                    <Input name="password" value={password} onChange={(e) => { setPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Create a new password" />
-                    <Input name="confirmPassword" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value) }} type="password" className="rounded-lg" placeholder="Enter your password" />
+                    <Input name="name" onChange={(e) => { setName(e.target.value) }} value={name} className="w-full rounded-xl shadow-lg border text-sm placeholder-slate-400" placeholder="Name" />
+                    <Input name="email" type="email" onChange={(e) => { setEmail(e.target.value) }} value={email} className="w-full rounded-xl shadow-lg border text-sm placeholder-slate-400" placeholder="Email" />
+                    <Input name="password" value={password} onChange={(e) => { setPassword(e.target.value) }} type="password" className="w-full rounded-xl shadow-lg border text-sm placeholder-slate-400" placeholder="Create a new password" />
+                    <Input name="confirmPassword" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value) }} type="password" className="w-full rounded-xl shadow-lg border text-sm placeholder-slate-400" placeholder="Enter your password" />
                     <p className="text-xs cursor-pointer hover:text-red-500 transition-colors duration-75 ease-in-out" onClick={() => {
                         setFormState(false);
                         setName('');

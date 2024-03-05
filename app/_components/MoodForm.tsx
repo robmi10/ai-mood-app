@@ -14,6 +14,7 @@ import Mood from "./Mood";
 
 export default function asyncUserForm() {
   const [notes, setNotes] = useState("");
+  const [hasAnswerToday, setHasAnswerToday] = useState(false);
   const { selectedSleep, setSelectedSleep, selectedWeather,
     setSelectedWeather, selectedActivity, setSelectedActivity, setSelectedMood, moodScore, account } = useContext(MoodContext);
   const user = account?.user ?? false;
@@ -40,6 +41,7 @@ export default function asyncUserForm() {
       notes: notes, activities: selectedActivity, sleepQuality: selectedSleep, weather: selectedWeather
     }, {
       onSuccess() {
+        setHasAnswerToday(true)
         todayAnswer.refetch()
       }
     })
@@ -48,7 +50,7 @@ export default function asyncUserForm() {
 
   return (
     <>
-      {!hasUserAnsweredToday && <div className="flex h-auto flex-col gap-8 items-center w-full mt-8 md:w-3/6 animate-fadeIn">
+      {!hasUserAnsweredToday && !hasAnswerToday && < div className="flex h-auto flex-col gap-8 items-center w-full mt-8 md:w-3/6 animate-fadeIn">
         <div className="w-full space-y-8">
           <div className="md:text-4xl text-white font-bold items-center">{user?.name} How Are You Feeling Today? </div>
           <div className="md:text-2xl text-white font-bold items-center"> Just take a moment to reflect on your day. Select the mood that resonates with you currently.</div>
@@ -61,8 +63,8 @@ export default function asyncUserForm() {
         <div className="space-x-2 bg-red w-full flex justify-end">
           <Button className="bg-white w-24 rounded-xl shadow-lg text-black" onClick={() => { handleSubmit() }}>SUBMIT</Button>
         </div>
-      </div>}
-      {hasUserAnsweredToday && <Statistic />}
+      </div >}
+      {(hasUserAnsweredToday || hasAnswerToday) && <Statistic />}
     </>
   );
 }

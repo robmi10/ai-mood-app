@@ -168,8 +168,7 @@ export const moodRouter = createTRPCRouter({
                 .selectAll()
                 .where('userId', '=', userId)
                 .where('createdAt', '>=', start)
-                .where('createdAt', '<=', end)
-                .execute();
+                .where('createdAt', '<=', end).orderBy('createdAt', 'asc').execute();
 
             allMoodsWeekly.forEach(mood => {
                 const moodType = formatPointToMood(Number(decrypt(mood.moodScore)));
@@ -206,8 +205,7 @@ export const moodRouter = createTRPCRouter({
                     .selectAll()
                     .where('userId', '=', userId)
                     .where('createdAt', '>=', frame.start)
-                    .where('createdAt', '<=', frame.end)
-                    .execute();
+                    .where('createdAt', '<=', frame.end).orderBy('createdAt', 'asc').execute();
 
                 let sum = 0;
                 allMoodsMonthly.forEach(mood => {

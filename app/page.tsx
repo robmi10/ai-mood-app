@@ -12,7 +12,7 @@ export default async function Home() {
         <h1 className="text-2xl md:text-5xl font-bold">Embrace Your Feelings, Transform Your Days</h1>
         <h1 className="text-xl md:text-2xl font-bold">Sign in to unlock insights into your mood and wellbeing</h1>
       </div>
-      <div className="flex mt-4 lg:max-w-[500px] justify-around flex-col h-[420px] md:h-96 border p-16 rounded-xl space-y-4 text-black bg-white">
+      <div className="flex mt-4 p-8 lg:max-w-[500px] justify-around flex-col md:h-[420px]  border md:p-16 rounded-xl space-y-4 text-black bg-white">
         <div className="w-full justify-center animate-fadeSmooth">
           <EmailSignInButton />
           <div className="flex md:block">

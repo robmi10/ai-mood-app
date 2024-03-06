@@ -9,17 +9,14 @@ AI Mood Insights is an innovative application designed to support mental health 
 ## Features
 - Daily mood tracking
 - Mood pattern analysis using AI
-- Insights into emotional well-being
-- Secure user registration and authentication
 
 ## Technology Stack
-Frontend: Next.js (v.14)
-Backend: tRPC for type-safe API routes
-Database: PostgreSQL via Supabase
-AI Analysis: OpenAI
-Data Vectorization: Pinecone
-Authentication: NextAuth
-Getting Started
+- Frontend: Next.js (v.14)
+- Backend: tRPC for type-safe API routes
+- Database: PostgreSQL via Supabase
+- AI Analysis: OpenAI
+- Data Vectorization: Pinecone
+- Authentication: NextAuth
 
 ## Getting Started
 To use AI Mood Insights, you'll need API keys for Pinecone and OpenAI, and a PostgreSQL database setup. Follow the installation instructions to set up your local development environment.

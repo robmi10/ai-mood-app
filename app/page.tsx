@@ -7,16 +7,18 @@ export default async function Home() {
 
 
   if (!session) return <div className="flex items-center justify-center flex-col h-screen  ">
-    <div className="flex flex-col w-8/12 md:w-6/12 animate-fadeSmooth">
+    <div className="flex flex-col w-10/12 md:w-6/12 animate-fadeSmooth">
       <div className="space-y-4 text-white">
         <h1 className="text-2xl md:text-5xl font-bold">Embrace Your Feelings, Transform Your Days</h1>
         <h1 className="text-xl md:text-2xl font-bold">Sign in to unlock insights into your mood and wellbeing</h1>
       </div>
-      <div className="flex mt-4 lg:max-w-[500px] justify-around flex-col h-96 border p-16 rounded-xl space-y-4 text-black bg-white">
+      <div className="flex mt-4 lg:max-w-[500px] justify-around flex-col h-[420px] md:h-96 border p-16 rounded-xl space-y-4 text-black bg-white">
         <div className="w-full justify-center animate-fadeSmooth">
           <EmailSignInButton />
-          <GoogleSignInButton />
-          <GithubSignInButton />
+          <div className="flex md:block">
+            <GoogleSignInButton />
+            <GithubSignInButton />
+          </div>
         </div>
       </div>
     </div>

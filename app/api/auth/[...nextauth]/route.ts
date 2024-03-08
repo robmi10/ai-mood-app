@@ -9,12 +9,12 @@ import { db } from "@/utils/db/db";
 const authOptions: NextAuthOptions = {
     providers: [
         GitHubProvider({
-            clientId: process.env.NEXT_PUBLIC_GITHUB_ID ?? "",
-            clientSecret: process.env.NEXT_PUBLIC_GITHUB_SECRET ?? "",
+            clientId: process.env.NEXT_GITHUB_ID ?? "",
+            clientSecret: process.env.NEXT_GITHUB_SECRET ?? "",
         }),
         GoogleProvider({
-            clientId: process.env.NEXT_PUBLIC_GOOGLE_ID ?? "",
-            clientSecret: process.env.NEXT_PUBLIC_GOOGLE_SECRET ?? "",
+            clientId: process.env.NEXT_GOOGLE_ID ?? "",
+            clientSecret: process.env.NEXT_GOOGLE_SECRET ?? "",
         }),
         CredentialsProvider({
             name: 'Credentials',
